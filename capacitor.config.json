@@ -1,0 +1,5 @@
+{
+  "appId": "com.triatomineos.app",
+  "appName": "Triatomineos",
+  "webDir": "dist/spa"
+}
