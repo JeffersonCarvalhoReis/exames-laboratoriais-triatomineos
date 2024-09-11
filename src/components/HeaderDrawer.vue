@@ -1,36 +1,45 @@
 <template>
-  <MainHeader @toggle-drawer="toggleLeftDrawer" :title="title" :logado="logado" />
-  <MenuDrawer :drawer="leftDrawerOpen" @update:drawer="leftDrawerOpen = $event" />
+  <MainHeader
+    @toggle-drawer="toggleLeftDrawer"
+    :title="title"
+    :logado="logado"
+    :exame="exame"
+  />
+  <MenuDrawer
+    :drawer="leftDrawerOpen"
+    @update:drawer="leftDrawerOpen = $event"
+  />
 </template>
 
 <script>
-  import MainHeader from './MainHeader.vue';
-  import MenuDrawer from './MenuDrawer.vue';
-  export default {
-    components: { MainHeader, MenuDrawer },
-    props: {
-      title: {
-        type: String,
-      },
-      logado: {
-        type: Boolean,
-        default: true
-      },
-
-
-
+import MainHeader from "./MainHeader.vue";
+import MenuDrawer from "./MenuDrawer.vue";
+export default {
+  components: { MainHeader, MenuDrawer },
+  props: {
+    title: {
+      type: String,
     },
-    data() {
-      return {
-        leftDrawerOpen: false,
-      };
+    logado: {
+      type: Boolean,
+      default: true,
     },
-    methods: {
-      toggleLeftDrawer() {
-        this.leftDrawerOpen = !this.leftDrawerOpen;
-      }
+    exame: {
+      type: Boolean,
+      default: false,
     },
-  }
+  },
+  data() {
+    return {
+      leftDrawerOpen: false,
+    };
+  },
+  methods: {
+    toggleLeftDrawer() {
+      this.leftDrawerOpen = !this.leftDrawerOpen;
+    },
+  },
+};
 </script>
 
 <style></style>
