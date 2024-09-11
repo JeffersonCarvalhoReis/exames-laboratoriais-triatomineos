@@ -4,6 +4,7 @@
     :title="title"
     :logado="logado"
     :exame="exame"
+    :excluidos="excluidos"
   />
   <MenuDrawer
     :drawer="leftDrawerOpen"
@@ -25,6 +26,10 @@ export default {
       default: true,
     },
     exame: {
+      type: Boolean,
+      default: false,
+    },
+    excluidos: {
       type: Boolean,
       default: false,
     },

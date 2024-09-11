@@ -6,6 +6,7 @@ import NovoExame from "../pages/NovoExame.vue";
 import VerificarExames from "../pages/VerificarExames.vue";
 import GerarResultados from "../pages/GerarResultados.vue";
 import ResultadosExames from "src/pages/ResultadosExames.vue";
+import ExamesExcluidos from "src/pages/ExamesExcluidos.vue";
 
 const routes = [
   {
@@ -18,6 +19,7 @@ const routes = [
       { path: "verificar-exames", component: VerificarExames },
       { path: "gerar-resultados", component: GerarResultados },
       { path: "resultados-exames", component: ResultadosExames },
+      { path: "excluidos-exames", component: ExamesExcluidos },
     ],
   },
 ];
