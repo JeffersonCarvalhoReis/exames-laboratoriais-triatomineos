@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import MainLayout from "../layouts/MainLayout.vue";
 import MainLogin from "../pages/MainLogin.vue";
 import MainHome from "../pages/MainHome.vue";
@@ -9,20 +9,12 @@ import GerarResultados from "../pages/GerarResultados.vue";
 import ResultadosExames from "src/pages/ResultadosExames.vue";
 import ExamesExcluidos from "src/pages/ExamesExcluidos.vue";
 
-// const checkAuth = (to, from, next) => {
-//   const authStore = useAuthStore();
-//   if (!authStore.user) {
-//     next("/");
-//   } else {
-//     next();
-//   }
-// };
 const routes = [
   {
     path: "/",
     component: MainLayout, // O MainLayout envolve as rotas
     children: [
-      { path: "", component: MainLogin },
+      { path: "", component: MainLogin, meta: { guestOnly: true } },
       { path: "home", component: MainHome, meta: { requiresAuth: true } },
       {
         path: "novo-exame",
@@ -57,16 +49,25 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+
 router.beforeEach((to, from, next) => {
   const auth = getAuth();
-  const user = auth.currentUser;
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+  const guestOnly = to.matched.some((record) => record.meta.guestOnly);
 
-  if (to.matched.some((record) => record.meta.requiresAuth) && !user) {
-    // Redireciona para a página de login se não estiver autenticado
-    next("/");
-  } else {
-    next();
-  }
+  // Espera até que o Firebase carregue o estado de autenticação do usuário
+  onAuthStateChanged(auth, (user) => {
+    if (requiresAuth && !user) {
+      // Se a rota requer autenticação e o usuário não está autenticado
+      next("/");
+    } else if (guestOnly && user) {
+      // Se o usuário está autenticado e tenta acessar uma rota de login, redireciona para a página "home"
+      next("/home");
+    } else {
+      // Permite o acesso às rotas
+      next();
+    }
+  });
 });
 
 export default router;

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <HeaderDrawer title="verificar exames" excluidos="true" />
+    <HeaderDrawer title="verificar exames" :excluidos="true" />
     <div class="column no-wrap">
       <div class="row q-gutter-lg q-ma-lg justify-center q-pa-lg">
         <q-select
@@ -48,6 +48,7 @@
 </template>
 
 <script>
+import { useElementStore } from "src/stores/elementsStore";
 import HeaderDrawer from "src/components/HeaderDrawer.vue";
 export default {
   components: { HeaderDrawer },
@@ -86,6 +87,15 @@ export default {
       filteredMonths: [],
     };
   },
+  beforeMount() {
+    useElementStore().separador = false;
+    useElementStore().barraVertical = true;
+  },
+  beforeUnmount() {
+    useElementStore().barraVertical = false;
+    useElementStore().separador = true;
+  },
+
   methods: {
     // Método chamado ao escolher um ano
     onYearChange() {

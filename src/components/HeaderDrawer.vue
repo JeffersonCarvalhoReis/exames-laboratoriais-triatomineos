@@ -2,7 +2,6 @@
   <MainHeader
     @toggle-drawer="toggleLeftDrawer"
     :title="title"
-    :logado="logado"
     :exame="exame"
     :excluidos="excluidos"
   />
@@ -20,10 +19,6 @@ export default {
   props: {
     title: {
       type: String,
-    },
-    logado: {
-      type: Boolean,
-      default: true,
     },
     exame: {
       type: Boolean,

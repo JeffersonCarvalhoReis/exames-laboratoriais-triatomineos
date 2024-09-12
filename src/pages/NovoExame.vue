@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import { useElementStore } from "src/stores/elementsStore";
 import HeaderDrawer from "src/components/HeaderDrawer.vue";
 import ExameForm from "../components/ExameForm.vue";
 
@@ -16,6 +17,14 @@ export default {
     onSubmit(exameData) {
       // Logic to handle form submission
     },
+  },
+  beforeMount() {
+    useElementStore().atualizaSeparador(false);
+    useElementStore().barraVertical = true;
+  },
+  beforeUnmount() {
+    useElementStore().barraVertical = false;
+    useElementStore().atualizaSeparador(true);
   },
 };
 </script>

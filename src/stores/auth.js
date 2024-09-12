@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { getAuth } from "firebase/auth";
 import { auth } from "src/firebaseConfig";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { ref } from "vue";
@@ -15,7 +16,6 @@ export const useAuthStore = defineStore("auth", () => {
         email,
         password
       );
-      console.log("usuario logado", userCredential.user);
       user.value = userCredential.user;
       router.push("/home");
     } catch (error) {
