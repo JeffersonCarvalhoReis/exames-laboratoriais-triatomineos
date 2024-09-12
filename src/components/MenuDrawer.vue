@@ -35,7 +35,7 @@
         </div>
         <q-separator />
         <div class="drawer-footer">
-          <q-item clickable v-ripple @click="navigate('/')">
+          <q-item clickable v-ripple @click="onLogout">
             <q-item-section>
               Logout
             </q-item-section>
@@ -51,6 +51,7 @@
 </template>
 
 <script>
+  import { useAuthStore } from 'src/stores/auth';
   export default {
     props: {
       drawer: {
@@ -72,6 +73,17 @@
       }
     },
     methods: {
+      async onLogout() {
+        const auth = useAuthStore();
+        console.log("Tentando fazer logout...");
+        try {
+          await auth.logout()
+          console.log("Logout bem-sucedido");
+        } catch (error) {
+          console.error('Erro ao fazer logout', error);
+        }
+      },
+
       updateDrawer(val) {
         this.internalDrawer = val;
       },
