@@ -8,6 +8,7 @@ import VerificarExames from "../pages/VerificarExames.vue";
 import GerarResultados from "../pages/GerarResultados.vue";
 import ResultadosExames from "src/pages/ResultadosExames.vue";
 import ExamesExcluidos from "src/pages/ExamesExcluidos.vue";
+import EditarPerfil from "src/pages/EditarPerfil.vue";
 
 const routes = [
   {
@@ -39,6 +40,11 @@ const routes = [
       {
         path: "excluidos-exames",
         component: ExamesExcluidos,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "editar-perfil",
+        component: EditarPerfil,
         meta: { requiresAuth: true },
       },
     ],

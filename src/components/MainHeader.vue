@@ -3,14 +3,7 @@
     <q-toolbar class="flex justify-around items-center">
       <div v-if="isLoggedIn">
         <div></div>
-        <q-btn
-          flat
-          round
-          dense
-          icon="menu"
-          class="q-mr-sm"
-          @click="$emit('toggle-drawer')"
-        />
+        <q-btn flat round dense icon="menu" class="q-mr-sm" @click="$emit('toggle-drawer')" />
       </div>
       <q-separator dark vertical inset v-if="isLoggedIn" />
       <q-space />
@@ -20,14 +13,7 @@
       <q-space />
       <div class="canto" v-if="separador"></div>
       <q-separator dark vertical inset class="q-mx-sm" v-show="barraVertical" />
-      <q-btn
-        flat
-        round
-        dense
-        icon="more_vert"
-        @click="openMenu"
-        v-if="excluidos"
-      >
+      <q-btn flat round dense icon="more_vert" @click="openMenu" v-if="menuExcluido">
         <q-menu transition-show="scale" transition-hide="scale">
           <q-list style="min-width: 100px">
             <q-item clickable to="/excluidos-exames">
@@ -37,7 +23,7 @@
         </q-menu>
       </q-btn>
 
-      <div v-if="exame" class="q-ml-sm">
+      <div v-if="iconeExame" class="q-ml-sm">
         <i class="fa-solid fa-microscope fa-2xl"></i>
       </div>
     </q-toolbar>
@@ -45,56 +31,55 @@
 </template>
 
 <script>
-import { useElementStore } from "src/stores/elementsStore";
-import { getAuth } from "firebase/auth";
-const element = useElementStore();
-export default {
-  props: {
-    title: {
-      type: String,
-      default: "exames de triatomíneos",
+  import { useElementStore } from "src/stores/elementsStore";
+  import { getAuth } from "firebase/auth";
+  export default {
+    props: {
+      title: {
+        type: String,
+        default: "exames de triatomíneos",
+      },
     },
-  },
-  data() {
-    return {
-      user: null, // Estado do usuário
-      separador: element.separador,
-      barraVertical: element.barraVertical,
-      menuExcluido: us,
-    };
-  },
+    data() {
+      return {
+        user: null, // Estado do usuário
+        separador: useElementStore().separador,
+        barraVertical: useElementStore().barraVertical,
+        menuExcluido: useElementStore().menuExcluido,
+        iconeExame: useElementStore().iconeExame
+      };
+    },
 
-  computed: {
-    element() {
-      return useElementStore();
-    },
-    // Computed para verificar se o usuário está logado
-    isLoggedIn() {
-      return !!this.user;
-    },
-  },
+    computed: {
 
-  methods: {
-    // Método para buscar o estado do usuário
-    checkAuthState() {
-      const auth = getAuth();
-      this.user = auth.currentUser; // Atualiza o estado local com o valor da store
+      // Computed para verificar se o usuário está logado
+      isLoggedIn() {
+        return !!this.user;
+      },
     },
-  },
 
-  mounted() {
-    // Simula o delay inicial para carregar o estado de autenticação
-    this.checkAuthState();
-  },
-};
+    methods: {
+      // Método para buscar o estado do usuário
+      checkAuthState() {
+        const auth = getAuth();
+        this.user = auth.currentUser; // Atualiza o estado local com o valor da store
+      },
+    },
+
+    mounted() {
+      // Simula o delay inicial para carregar o estado de autenticação
+      this.checkAuthState();
+    },
+  };
 </script>
 <style scoped>
-.canto {
-  width: 30px;
-}
-.flex-row-nowrap {
-  display: flex;
-  flex-wrap: nowrap;
-  /* Impede a quebra de linha */
-}
+  .canto {
+    width: 30px;
+  }
+
+  .flex-row-nowrap {
+    display: flex;
+    flex-wrap: nowrap;
+    /* Impede a quebra de linha */
+  }
 </style>

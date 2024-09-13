@@ -30,6 +30,12 @@
               </q-item-section>
             </q-item>
             <q-separator />
+            <q-item clickable v-ripple @click="navigate('/editar-perfil')">
+              <q-item-section>
+                Editar Perfil
+              </q-item-section>
+            </q-item>
+            <q-separator />
 
           </q-list>
         </div>

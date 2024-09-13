@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 export const useElementStore = defineStore("elements", {
   state: () => ({
     separador: true,
-    barraVertical: true,
+    barraVertical: false,
     iconeExame: false,
     menuExcluido: false,
   }),

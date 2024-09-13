@@ -85,8 +85,6 @@ module.exports = configure(function (/* ctx */) {
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
-      config: {},
-
       // iconSet: 'material-icons', // Quasar icon set
       lang: "pt-br", // Quasar language pack
 
@@ -102,7 +100,7 @@ module.exports = configure(function (/* ctx */) {
       config: {
         notify: {
           progress: true,
-          timeout: 500,
+          timeout: 2000,
           /* look at QUASARCONFOPTIONS from the API card (bottom of page) */
         },
       },
