@@ -12,8 +12,8 @@
             <!-- PIT -->
             <q-field label="PIT:" stack-label>
               <div class="q-mb-md">
-                <q-radio v-model="pit" val="sim" label="Sim" @change="handlePitChange" />
-                <q-radio v-model="pit" val="não" label="Não" @change="handlePitChange" />
+                <q-radio v-model="pit" val="sim" label="Sim" @update:model-value="clearInputValidation" />
+                <q-radio v-model="pit" val="não" label="Não" @update:model-value="clearInputValidation" />
               </div>
             </q-field>
             <div class="row q-gutter-lg">
@@ -24,7 +24,7 @@
               <!-- Data do exame -->
               <q-input v-model="dataExame" class="col-md-2 col-11">
                 <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                  <q-date v-model="dataExame" mask="MM/DD/YYYY">
+                  <q-date v-model="dataExame" mask="DD/MM/YYYY">
                     <div class="row items-center justify-end">
                       <q-btn v-close-popup label="Close" color="primary" flat />
                     </div>
@@ -205,6 +205,14 @@
     },
 
     methods: {
+      formattedDate(data) {
+        const [day, month, year] = data.split("/");
+        return `${year}-${month}-${day}`
+      },
+      clearInputValidation() {
+        this.numeroEtiqueta = '';
+        this.$refs.numeroEtiquetaInput.resetValidation();
+      },
       verificarCamposObrigatorios() {
         return this.exames.every(exame => exame.codigo && exame.nome) && this.numeroEtiqueta;
       },
@@ -223,6 +231,7 @@
             timeout: 4500,
             message: 'Preencha o campo número da etiqueta',
           });
+          return;
         }
         if (!this.verificarCamposObrigatorios()) {
           this.$q.notify({
@@ -245,9 +254,13 @@
           await addDoc(collection(db, "exames"), {
             pit: this.pit,
             numeroEtiqueta: this.numeroEtiqueta,
-            dataExame: this.dataExame,
+            dataExame: this.formattedDate(this.dataExame),
             responsavel: this.responsavel,
             exames: this.exames, // Salva todos os exames de uma vez
+          });
+          window.scrollTo({
+            top: 0,       // Define o topo da página
+            behavior: 'smooth'  // Suaviza o efeito de rolagem
           });
           this.$q.notify({
             message: "Exame salvo com sucesso!",

@@ -1,8 +1,11 @@
 <template>
   <q-page>
     <HeaderDrawer title="resultados" />
-    <ExameResultadoTable />
-    <h1>teste 1</h1>
+    <ExameResultadoTable
+      message="Identificação e detecção da infecção natural de triatomíneos quadrimestral (por vigilância ativa -  aplicada pelo SUS)" />
+    <q-separator />
+    <ExameResultadoTable
+      message="Identificação e detecção da infecção natural de triatomíneos quadrimestral (por vigilância passiva – vigilância popular)" />
   </q-page>
 </template>
 

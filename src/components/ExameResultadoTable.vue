@@ -1,57 +1,54 @@
 <template>
-  <q-page class="q-pa-md">
-
-    <div class="q-table-container">
-      <p>{{ message }}</p>
-      <q-table :grid="$q.screen.lt.sm" bordered :rows="rows" :columns="columns" row-key="codigo_ibge" flat
-        :virtual-scroll="true" dense separator="cell">
-        <template v-slot:body-cell="{ row, col }">
-          <q-td>{{ row[col.field] }}</q-td>
-        </template>
-        <template v-slot:header="">
-          <q-tr :props="pros">
-            <q-th rowspan="4">Cód. IBGE</q-th>
-            <q-th rowspan="4">Município</q-th>
-            <q-th rowspan="4">GRAU <br />DE <br />RISCO</q-th>
-            <q-th rowspan="4" wrap-cells>Espécie <br>de <br>triatomíneo</q-th>
-            <q-th colspan="18">Triatomíneos</q-th>
-          </q-tr>
-          <q-tr>
-            <q-th colspan="9">Intra</q-th>
-            <q-th colspan="9">Peri</q-th>
-          </q-tr>
-          <q-tr>
-            <q-th colspan="3">Capturados</q-th>
-            <q-th colspan="3">Analisados</q-th>
-            <q-th colspan="3">Positivos</q-th>
-            <q-th colspan="3">Capturados</q-th>
-            <q-th colspan="3">Analisados</q-th>
-            <q-th colspan="3">Positivos</q-th>
-          </q-tr>
-          <q-tr>
-            <q-th>A</q-th>
-            <q-th>N</q-th>
-            <q-th>T</q-th>
-            <q-th>A</q-th>
-            <q-th>N</q-th>
-            <q-th>T</q-th>
-            <q-th>A</q-th>
-            <q-th>N</q-th>
-            <q-th>T</q-th>
-            <q-th>A</q-th>
-            <q-th>N</q-th>
-            <q-th>T</q-th>
-            <q-th>A</q-th>
-            <q-th>N</q-th>
-            <q-th>T</q-th>
-            <q-th>A</q-th>
-            <q-th>N</q-th>
-            <q-th>T</q-th>
-          </q-tr>
-        </template>
-      </q-table>
-    </div>
-  </q-page>
+  <div class="q-table-container q-m-lg">
+    <p>{{ message }}</p>
+    <q-table :grid="$q.screen.lt.sm" bordered :rows="rows" :columns="columns" row-key="codigo_ibge" flat
+      :virtual-scroll="true" dense separator="cell">
+      <template v-slot:body-cell="{ row, col }">
+        <q-td>{{ row[col.field] }}</q-td>
+      </template>
+      <template v-slot:header="">
+        <q-tr :props="pros">
+          <q-th rowspan="4">Cód. IBGE</q-th>
+          <q-th rowspan="4">Município</q-th>
+          <q-th rowspan="4">GRAU <br />DE <br />RISCO</q-th>
+          <q-th rowspan="4" wrap-cells>Espécie <br>de <br>triatomíneo</q-th>
+          <q-th colspan="18">Triatomíneos</q-th>
+        </q-tr>
+        <q-tr>
+          <q-th colspan="9">Intra</q-th>
+          <q-th colspan="9">Peri</q-th>
+        </q-tr>
+        <q-tr>
+          <q-th colspan="3">Capturados</q-th>
+          <q-th colspan="3">Analisados</q-th>
+          <q-th colspan="3">Positivos</q-th>
+          <q-th colspan="3">Capturados</q-th>
+          <q-th colspan="3">Analisados</q-th>
+          <q-th colspan="3">Positivos</q-th>
+        </q-tr>
+        <q-tr>
+          <q-th>A</q-th>
+          <q-th>N</q-th>
+          <q-th>T</q-th>
+          <q-th>A</q-th>
+          <q-th>N</q-th>
+          <q-th>T</q-th>
+          <q-th>A</q-th>
+          <q-th>N</q-th>
+          <q-th>T</q-th>
+          <q-th>A</q-th>
+          <q-th>N</q-th>
+          <q-th>T</q-th>
+          <q-th>A</q-th>
+          <q-th>N</q-th>
+          <q-th>T</q-th>
+          <q-th>A</q-th>
+          <q-th>N</q-th>
+          <q-th>T</q-th>
+        </q-tr>
+      </template>
+    </q-table>
+  </div>
 </template>
 
 <script>
@@ -162,131 +159,131 @@
           },
         ],
         rows: [
-          {
-            codigo_ibge: "2915353",
-            municipio: "Itaguaçu da Bahia",
-            grau_risco: "ALTO",
-            especie: 2,
-            a_intra_capturado: 10,
-            n_intra_capturado: 10,
-            t_intra_capturado: 20,
-            n_intra_analisado: 4,
-            a_intra_analisado: 0,
-            t_intra_analisado: 0,
-            a_intra_positivo: 0,
-            n_intra_positivo: 0,
-            t_intra_positivo: 0,
+          // {
+          //   codigo_ibge: "2915353",
+          //   municipio: "Itaguaçu da Bahia",
+          //   grau_risco: "ALTO",
+          //   especie: 2,
+          //   a_intra_capturado: 10,
+          //   n_intra_capturado: 10,
+          //   t_intra_capturado: 20,
+          //   n_intra_analisado: 4,
+          //   a_intra_analisado: 0,
+          //   t_intra_analisado: 0,
+          //   a_intra_positivo: 0,
+          //   n_intra_positivo: 0,
+          //   t_intra_positivo: 0,
 
-            a_peri_capturado: 9,
-            n_peri_capturado: 0,
-            t_peri_capturado: 9,
-            a_peri_analisado: 2,
-            n_peri_analisado: 0,
-            t_peri_analisado: 2,
-            a_peri_positivo: 0,
-            n_peri_positivo: 0,
-            t_peri_positivo: 0,
-          },
-          {
-            codigo_ibge: "2915353",
-            municipio: "Itaguaçu da Bahia",
-            grau_risco: "ALTO",
-            especie: 3,
-            a_intra_capturado: 10,
-            n_intra_capturado: 10,
-            t_intra_capturado: 20,
-            n_intra_analisado: 4,
-            a_intra_analisado: 0,
-            t_intra_analisado: 0,
-            a_intra_positivo: 0,
-            n_intra_positivo: 0,
-            t_intra_positivo: 0,
+          //   a_peri_capturado: 9,
+          //   n_peri_capturado: 0,
+          //   t_peri_capturado: 9,
+          //   a_peri_analisado: 2,
+          //   n_peri_analisado: 0,
+          //   t_peri_analisado: 2,
+          //   a_peri_positivo: 0,
+          //   n_peri_positivo: 0,
+          //   t_peri_positivo: 0,
+          // },
+          // {
+          //   codigo_ibge: "2915353",
+          //   municipio: "Itaguaçu da Bahia",
+          //   grau_risco: "ALTO",
+          //   especie: 3,
+          //   a_intra_capturado: 10,
+          //   n_intra_capturado: 10,
+          //   t_intra_capturado: 20,
+          //   n_intra_analisado: 4,
+          //   a_intra_analisado: 0,
+          //   t_intra_analisado: 0,
+          //   a_intra_positivo: 0,
+          //   n_intra_positivo: 0,
+          //   t_intra_positivo: 0,
 
-            a_peri_capturado: 9,
-            n_peri_capturado: 0,
-            t_peri_capturado: 9,
-            a_peri_analisado: 2,
-            n_peri_analisado: 0,
-            t_peri_analisado: 2,
-            a_peri_positivo: 0,
-            n_peri_positivo: 0,
-            t_peri_positivo: 0,
-          },
-          {
-            codigo_ibge: "2915353",
-            municipio: "Itaguaçu da Bahia",
-            grau_risco: "ALTO",
-            especie: 4,
-            a_intra_capturado: 10,
-            n_intra_capturado: 10,
-            t_intra_capturado: 20,
-            n_intra_analisado: 4,
-            a_intra_analisado: 0,
-            t_intra_analisado: 0,
-            a_intra_positivo: 0,
-            n_intra_positivo: 0,
-            t_intra_positivo: 0,
+          //   a_peri_capturado: 9,
+          //   n_peri_capturado: 0,
+          //   t_peri_capturado: 9,
+          //   a_peri_analisado: 2,
+          //   n_peri_analisado: 0,
+          //   t_peri_analisado: 2,
+          //   a_peri_positivo: 0,
+          //   n_peri_positivo: 0,
+          //   t_peri_positivo: 0,
+          // },
+          // {
+          //   codigo_ibge: "2915353",
+          //   municipio: "Itaguaçu da Bahia",
+          //   grau_risco: "ALTO",
+          //   especie: 4,
+          //   a_intra_capturado: 10,
+          //   n_intra_capturado: 10,
+          //   t_intra_capturado: 20,
+          //   n_intra_analisado: 4,
+          //   a_intra_analisado: 0,
+          //   t_intra_analisado: 0,
+          //   a_intra_positivo: 0,
+          //   n_intra_positivo: 0,
+          //   t_intra_positivo: 0,
 
-            a_peri_capturado: 9,
-            n_peri_capturado: 0,
-            t_peri_capturado: 9,
-            a_peri_analisado: 2,
-            n_peri_analisado: 0,
-            t_peri_analisado: 2,
-            a_peri_positivo: 0,
-            n_peri_positivo: 0,
-            t_peri_positivo: 0,
-          },
-          {
-            codigo_ibge: "2915353",
-            municipio: "Itaguaçu da Bahia",
-            grau_risco: "ALTO",
-            especie: 20,
-            a_intra_capturado: 10,
-            n_intra_capturado: 10,
-            t_intra_capturado: 20,
-            n_intra_analisado: 4,
-            a_intra_analisado: 0,
-            t_intra_analisado: 0,
-            a_intra_positivo: 0,
-            n_intra_positivo: 0,
-            t_intra_positivo: 0,
+          //   a_peri_capturado: 9,
+          //   n_peri_capturado: 0,
+          //   t_peri_capturado: 9,
+          //   a_peri_analisado: 2,
+          //   n_peri_analisado: 0,
+          //   t_peri_analisado: 2,
+          //   a_peri_positivo: 0,
+          //   n_peri_positivo: 0,
+          //   t_peri_positivo: 0,
+          // },
+          // {
+          //   codigo_ibge: "2915353",
+          //   municipio: "Itaguaçu da Bahia",
+          //   grau_risco: "ALTO",
+          //   especie: 20,
+          //   a_intra_capturado: 10,
+          //   n_intra_capturado: 10,
+          //   t_intra_capturado: 20,
+          //   n_intra_analisado: 4,
+          //   a_intra_analisado: 0,
+          //   t_intra_analisado: 0,
+          //   a_intra_positivo: 0,
+          //   n_intra_positivo: 0,
+          //   t_intra_positivo: 0,
 
-            a_peri_capturado: 9,
-            n_peri_capturado: 0,
-            t_peri_capturado: 9,
-            a_peri_analisado: 2,
-            n_peri_analisado: 0,
-            t_peri_analisado: 2,
-            a_peri_positivo: 0,
-            n_peri_positivo: 0,
-            t_peri_positivo: 0,
-          },
-          {
-            codigo_ibge: "2915353",
-            municipio: "Itaguaçu da Bahia",
-            grau_risco: "ALTO",
-            especie: 23,
-            a_intra_capturado: 10,
-            n_intra_capturado: 10,
-            t_intra_capturado: 20,
-            n_intra_analisado: 4,
-            a_intra_analisado: 0,
-            t_intra_analisado: 0,
-            a_intra_positivo: 0,
-            n_intra_positivo: 0,
-            t_intra_positivo: 0,
+          //   a_peri_capturado: 9,
+          //   n_peri_capturado: 0,
+          //   t_peri_capturado: 9,
+          //   a_peri_analisado: 2,
+          //   n_peri_analisado: 0,
+          //   t_peri_analisado: 2,
+          //   a_peri_positivo: 0,
+          //   n_peri_positivo: 0,
+          //   t_peri_positivo: 0,
+          // },
+          // {
+          //   codigo_ibge: "2915353",
+          //   municipio: "Itaguaçu da Bahia",
+          //   grau_risco: "ALTO",
+          //   especie: 23,
+          //   a_intra_capturado: 10,
+          //   n_intra_capturado: 10,
+          //   t_intra_capturado: 20,
+          //   n_intra_analisado: 4,
+          //   a_intra_analisado: 0,
+          //   t_intra_analisado: 0,
+          //   a_intra_positivo: 0,
+          //   n_intra_positivo: 0,
+          //   t_intra_positivo: 0,
 
-            a_peri_capturado: 9,
-            n_peri_capturado: 0,
-            t_peri_capturado: 9,
-            a_peri_analisado: 2,
-            n_peri_analisado: 0,
-            t_peri_analisado: 2,
-            a_peri_positivo: 0,
-            n_peri_positivo: 0,
-            t_peri_positivo: 0,
-          },
+          //   a_peri_capturado: 9,
+          //   n_peri_capturado: 0,
+          //   t_peri_capturado: 9,
+          //   a_peri_analisado: 2,
+          //   n_peri_analisado: 0,
+          //   t_peri_analisado: 2,
+          //   a_peri_positivo: 0,
+          //   n_peri_positivo: 0,
+          //   t_peri_positivo: 0,
+          // },
         ],
       };
     },
