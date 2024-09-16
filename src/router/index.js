@@ -9,6 +9,7 @@ import GerarResultados from "../pages/GerarResultados.vue";
 import ResultadosExames from "src/pages/ResultadosExames.vue";
 import ExamesExcluidos from "src/pages/ExamesExcluidos.vue";
 import EditarPerfil from "src/pages/EditarPerfil.vue";
+import ExameDetalhesPage from "src/pages/ExameDetalhesPage.vue";
 
 const routes = [
   {
@@ -46,6 +47,12 @@ const routes = [
         path: "editar-perfil",
         component: EditarPerfil,
         meta: { requiresAuth: true },
+      },
+      {
+        path: "detalhes-exame/:id",
+        component: ExameDetalhesPage,
+        meta: { requiresAuth: true },
+        props: true,
       },
     ],
   },

@@ -4,33 +4,20 @@
     class="q-mt-md"
     :resultados="resultados"
     :columns="columns"
+    :buscarExamesExcluidos="buscarExamesExcluidos"
   />
 </template>
+
 <script>
 import HeaderDrawer from "src/components/HeaderDrawer.vue";
 import ExameTableExcluidos from "src/components/ExameTableExcluidos.vue";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "src/firebaseConfig";
 export default {
   components: { HeaderDrawer, ExameTableExcluidos },
   data() {
     return {
-      resultados: [
-        {
-          dataExame: "03-25-2024",
-          responsavel: "Jefferson",
-        },
-        {
-          dataExame: "03-25-2024",
-          responsavel: "Jefferson",
-        },
-        {
-          dataExame: "04-25-2024",
-          responsavel: "Jefferson",
-        },
-        {
-          dataExame: "05-25-2024",
-          responsavel: "Jefferson",
-        },
-      ],
+      resultados: [],
       columns: [
         {
           name: "dataExame",
@@ -53,6 +40,35 @@ export default {
     formatarData(data) {
       return new Date(data).toLocaleDateString("pt-BR");
     },
+
+    async buscarExamesExcluidos() {
+      try {
+        // Configura a consulta para buscar exames excluídos
+        const q = query(collection(db, "exames"), where("deleted", "==", true));
+
+        // Obtém os documentos da consulta
+        const querySnapshot = await getDocs(q);
+
+        // Mapeia os documentos para extrair os dados
+        const resultados = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        resultados.sort(
+          (a, b) => new Date(b.dataExame) - new Date(a.dataExame)
+        );
+
+        // Atualiza o estado com os resultados
+        this.resultados = resultados;
+      } catch (error) {
+        console.error("Erro ao buscar exames excluídos:", error);
+      }
+    },
+  },
+  mounted() {
+    // Chama o método para buscar exames excluídos ao montar o componente
+    this.buscarExamesExcluidos();
   },
 };
 </script>

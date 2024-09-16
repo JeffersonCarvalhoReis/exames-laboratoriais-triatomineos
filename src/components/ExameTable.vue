@@ -1,5 +1,5 @@
 <template>
-  <q-table :rows="resultados" :columns="columns" row-key="dataExame" dense>
+  <q-table :rows="resultados" :columns="columns" row-key="id" dense>
     <!-- Coluna da lupa para visualizar mais detalhes -->
     <template v-slot:body-cell-details="props">
       <q-td align="center">
@@ -7,7 +7,7 @@
           icon="search"
           color="primary"
           flat
-          @click="viewDetails(props.row)"
+          @click="visualizarExame(props.row)"
         />
       </q-td>
     </template>
@@ -15,7 +15,12 @@
     <!-- Coluna da lixeira para excluir a linha -->
     <template v-slot:body-cell-actions="props">
       <q-td align="center">
-        <q-btn icon="delete" color="red" flat @click="excluir = true" />
+        <q-btn
+          icon="delete"
+          color="red"
+          flat
+          @click="confirmarExclusao(props.row)"
+        />
         <q-dialog v-model="excluir" persistent>
           <q-card>
             <q-card-section class="row items-center">
@@ -30,7 +35,7 @@
                 label="Excluir Exame"
                 color="negative"
                 v-close-popup
-                @click="excluirExame(props.row)"
+                @click="excluirExame(exameSelecionado)"
               />
             </q-card-actions>
           </q-card>
@@ -41,22 +46,50 @@
 </template>
 
 <script>
+import { doc, updateDoc } from "firebase/firestore"; // Firebase Firestore imports
+import { db } from "src/firebaseConfig";
+
 export default {
   data() {
     return {
       excluir: false,
+      exameSelecionado: null, // Para armazenar o exame selecionado para exclusão
     };
   },
   props: {
     resultados: Array,
     columns: Array,
+    buscarResultados: {
+      type: Function,
+      required: true,
+    },
   },
   methods: {
-    visualizarExame(id) {
-      this.$router.push(`/exame/${id}`);
+    visualizarExame(exame) {
+      this.$router.push(`/detalhes-exame/${exame.id}`);
     },
-    excluirExame(id) {
-      this.$emit("excluir", id);
+    confirmarExclusao(exame) {
+      this.exameSelecionado = exame; // Armazena o exame para exclusão
+      this.excluir = true; // Abre o diálogo de confirmação
+    },
+    async excluirExame(exame) {
+      try {
+        const exameRef = doc(db, "exames", exame.id); // Use o ID do exame
+        await updateDoc(exameRef, {
+          deleted: true, // Marca o exame como excluído
+        });
+        await this.buscarResultados();
+        this.$q.notify({
+          message: "Exame excluído com sucesso.",
+          type: "positive",
+        }); // Atualiza a tabela para remover o exame excluído
+      } catch (error) {
+        this.$q.notify({
+          message: "Falha ao excluir exame.",
+          type: "negative",
+        });
+        console.error("Erro ao excluir exame:", error);
+      }
     },
   },
 };
