@@ -15,31 +15,12 @@
 
       <q-card-section>
         <q-form @submit="onLogin">
-          <q-input
-            v-model="email"
-            label="Email"
-            type="email"
-            outlined
-            clearable
-            :rules="[(val) => !!val || 'O email é obrigatório']"
-            class="q-mb-md"
-          />
-          <q-input
-            v-model="senha"
-            label="Senha"
-            type="password"
-            outlined
-            clearable
-            :rules="[(val) => !!val || 'A senha é obrigatória']"
-            class="q-mb-md"
-          />
+          <q-input v-model="email" label="Email" type="email" outlined clearable
+            :rules="[(val) => !!val || 'O email é obrigatório']" class="q-mb-md" />
+          <q-input v-model="senha" label="Senha" type="password" outlined clearable
+            :rules="[(val) => !!val || 'A senha é obrigatória']" class="q-mb-md" />
           <div class="q-mt-md q-mb-sm">
-            <q-btn
-              label="Entrar"
-              type="submit"
-              color="primary"
-              class="full-width"
-            />
+            <q-btn label="Entrar" type="submit" color="primary" class="full-width" />
           </div>
         </q-form>
       </q-card-section>
@@ -50,47 +31,45 @@
 </template>
 
 <script>
-// import { signInWithEmailAndPassword } from 'firebase/auth';
-// import { auth } from 'src/firebaseConfig';
-import { useElementStore } from "src/stores/elementsStore";
-import { useAuthStore } from "src/stores/auth";
-import HeaderDrawer from "src/components/HeaderDrawer.vue";
-export default {
-  components: { HeaderDrawer },
-  name: "MainLogin",
+  import { useElementStore } from "src/stores/elementsStore";
+  import { useAuthStore } from "src/stores/auth";
+  import HeaderDrawer from "src/components/HeaderDrawer.vue";
+  export default {
+    components: { HeaderDrawer },
+    name: "MainLogin",
 
-  data() {
-    return {
-      email: "",
-      senha: "",
-      authStore: useAuthStore(),
-    };
-  },
-  beforeMount() {
-    useElementStore().separador = false;
-  },
-  beforeUnmount() {
-    useElementStore().separador = true;
-  },
-  methods: {
-    async onLogin() {
-      this.authStore.login(this.email, this.senha);
+    data() {
+      return {
+        email: "",
+        senha: "",
+        authStore: useAuthStore(),
+      };
     },
-  },
-};
+    beforeMount() {
+      useElementStore().separador = false;
+    },
+    beforeUnmount() {
+      useElementStore().separador = true;
+    },
+    methods: {
+      async onLogin() {
+        this.authStore.login(this.email, this.senha);
+      },
+    },
+  };
 </script>
 <style scoped>
-.login-card {
-  margin-bottom: 20px;
-  height: 100%;
-  width: 500px;
-  max-width: 90%;
-  padding: 30px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-}
+  .login-card {
+    margin-bottom: 20px;
+    height: 100%;
+    width: 500px;
+    max-width: 90%;
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
 
-.full-width {
-  width: 100%;
-}
+  .full-width {
+    width: 100%;
+  }
 </style>

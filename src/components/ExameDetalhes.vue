@@ -7,7 +7,7 @@
 
         <!-- Dados do exame -->
         <q-item-label>
-          <strong>Data do Exame:</strong> {{ formatarData(exame.dataExame) }}
+          <strong>Data do Exame:</strong> {{ dataExameFormatada }}
         </q-item-label>
         <q-item-label>
           <strong>Etiqueta:</strong> {{ exame.numeroEtiqueta }}
@@ -24,72 +24,73 @@
           <q-item v-for="(item, index) in exame.exames" :key="index">
             <q-item-section>
               <p class="text-uppercase text-bold">{{ index + 1 }}º exame</p>
-              <q-item-label
-                ><strong>Código:</strong> {{ item.codigo }}</q-item-label
-              >
-              <q-item-label
-                ><strong>Nome:</strong> {{ item.nome }}</q-item-label
-              >
-              <q-item-label
-                ><strong>Resultado:</strong> {{ item.resultado }}</q-item-label
-              >
-              <q-item-label
-                ><strong>Estágio:</strong> {{ item.estagio }}</q-item-label
-              >
-              <q-item-label
-                ><strong>Captura:</strong> {{ item.captura }}</q-item-label
-              >
-              <q-separator />
+              <q-item-label><strong>Código:</strong> <span class="text-uppercase">{{ item.codigo }}</span>
+              </q-item-label>
+              <q-item-label><strong>Nome:</strong> <span class="text-uppercase">{{ item.nome }}</span>
+              </q-item-label>
+              <q-item-label><strong>Resultado:</strong> <span class="text-uppercase">{{ item.resultado }}</span>
+              </q-item-label>
+              <q-item-label><strong>Estágio:</strong> <span class="text-uppercase">{{ item.estagio }}</span>
+              </q-item-label>
+              <q-item-label><strong>Captura:</strong> <span class="text-uppercase">{{ item.captura }}</span>
+              </q-item-label>
+              <q-separator class="q-mt-md" />
             </q-item-section>
           </q-item>
         </q-list>
       </q-card-section>
-      <q-card-actions>
-        <q-btn flat label="Voltar" color="primary" @click="$router.go(-1)" />
+      <q-card-actions class="q-pa-lg">
+        <q-btn label="Voltar" push icon="arrow_back " color="primary" style="padding: 0 20px 0 13px"
+          @click="$router.go(-1)" />
       </q-card-actions>
     </q-card>
   </div>
 </template>
 
 <script>
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "src/firebaseConfig";
+  import { doc, getDoc } from "firebase/firestore";
+  import { db } from "src/firebaseConfig";
+  import { formatarData } from "src/utils/dateUtils";
 
-export default {
-  data() {
-    return {
-      exame: {},
-    };
-  },
-  async created() {
-    const exameId = this.$route.params.id; // Obtém o ID do exame da URL
-    await this.buscarExame(exameId);
-  },
-  methods: {
-    async buscarExame(id) {
-      try {
-        const exameRef = doc(db, "exames", id);
-        const docSnap = await getDoc(exameRef);
-
-        if (docSnap.exists()) {
-          this.exame = { id: docSnap.id, ...docSnap.data() };
-        } else {
-          console.log("Nenhum exame encontrado!");
-        }
-      } catch (error) {
-        console.error("Erro ao buscar exame:", error);
+  export default {
+    data() {
+      return {
+        exame: {},
+      };
+    },
+    async created() {
+      const exameId = this.$route.params.id; // Obtém o ID do exame da URL
+      await this.buscarExame(exameId);
+    },
+    computed: {
+      dataExameFormatada() {
+        const data = this.exame.dataExame
+        return formatarData(data)
       }
     },
-    formatarData(data) {
-      return new Date(data).toLocaleDateString("pt-BR");
+    methods: {
+      async buscarExame(id) {
+        try {
+          const exameRef = doc(db, "exames", id);
+          const docSnap = await getDoc(exameRef);
+
+          if (docSnap.exists()) {
+            this.exame = { id: docSnap.id, ...docSnap.data() };
+          } else {
+            console.log("Nenhum exame encontrado!");
+          }
+        } catch (error) {
+          console.error("Erro ao buscar exame:", error);
+        }
+      },
+
     },
-  },
-};
+  };
 </script>
 
 <style scoped>
-.q-card {
-  max-width: 600px;
-  margin: auto;
-}
+  .q-card {
+    max-width: 600px;
+    margin: auto;
+  }
 </style>
