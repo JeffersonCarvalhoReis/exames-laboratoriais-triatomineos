@@ -103,6 +103,7 @@ module.exports = configure(function (/* ctx */) {
           timeout: 2000,
           /* look at QUASARCONFOPTIONS from the API card (bottom of page) */
         },
+        dark: false, // Força o modo claro em todo o aplicativo
       },
     },
 

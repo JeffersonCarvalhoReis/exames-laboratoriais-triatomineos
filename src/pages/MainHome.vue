@@ -8,7 +8,7 @@
 
       <q-btn icon="fa-solid fa-magnifying-glass" label="VERIFICAR EXAMES" class="col-12 col-md-5" color="secondary"
         @click="verificarExames" style="height: 150px; font-size: 20px;" />
-      <img class="barbeiro" src="/./public/icons/barbeiro.svg">
+      <img class="barbeiro q-mt-md" src="../assets/icon-background.png" alt="Imagem de fundo">
 
     </div>
   </q-page>
@@ -38,7 +38,8 @@
 
 <style scoped>
   .barbeiro {
-    width: 40vh;
+    width: 40%;
+    min-width: 350px;
   }
 
   .q-page {
