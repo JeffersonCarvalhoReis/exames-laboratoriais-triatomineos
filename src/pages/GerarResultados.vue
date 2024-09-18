@@ -1,20 +1,69 @@
 <template>
   <q-page class="gerar-resultados-page">
     <HeaderDrawer title="Gerar Resultados" />
-    <div v-for="(exames, key) in quadrimestresOrdenadosFormatados" :key="key" class="q-mb-md">
-      <p class="text-h6 text-uppercase q-mt-md">{{ exames.key }}</p>
-      <div>
-        De {{ exames.menorData }} até
-        {{ exames.maiorData }}
-      </div>
-      <ExameTable class="q-mt-md" :resultados="exames.resultados" :columns="columns"
-        :buscarResultados="buscarResultados" />
-      <q-btn label="Gerar Resultados" color="secondary" @click="gerarResultados(key)" />
-      <q-separator class="q-mt-md" v-if="quadrimestresOrdenados.length > 1" />
-      <div class="q-mt-md"></div>
+
+    <!-- Skeleton Loader -->
+    <div v-if="loading" class="q-mt-md q-mx-sm">
+      <q-skeleton type="text" class="text-h4" width="300px" />
+
+      <q-skeleton type="text" width="200px" class="q-my-sm" />
+
+      <q-markup-table>
+        <thead>
+          <tr>
+            <th class="text-left" style="width: 150px">
+              <q-skeleton animation="blink" type="text" />
+            </th>
+            <th class="text-left" style="width: 150px">
+              <q-skeleton animation="blink" type="text" />
+            </th>
+            <th class="text-left" style="width: 150px">
+              <q-skeleton animation="blink" type="text" />
+            </th>
+            <th class="text-left" style="width: 150px">
+              <q-skeleton animation="blink" type="text" />
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr v-for="n in 6" :key="n">
+            <td class="text-left">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+            <td class="text-right">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+            <td class="text-left">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+            <td class="text-left">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+          </tr>
+        </tbody>
+      </q-markup-table>
+      <q-skeleton type="QBtn" width="170px" />
+
     </div>
-    <ExameTable class="q-mt-md" :resultados="resultadosPorQuadrimestre" :columns="columns"
-      :buscarResultados="buscarResultados" v-if="semResultado" />
+
+    <!-- Content -->
+    <div v-else class="q-mx-sm">
+      <div v-for="(exames, key) in quadrimestresOrdenadosFormatados" :key="key" class="q-mb-md">
+        <p class="text-h6 text-uppercase q-mt-md">{{ exames.key }}</p>
+        <div>
+          De {{ exames.menorData }} até
+          {{ exames.maiorData }}
+        </div>
+        <ExameTable class="q-mt-md" :resultados="exames.resultados" :columns="columns"
+          :buscarResultados="buscarResultados" />
+        <q-btn label="Gerar Resultados" color="secondary" @click="gerarResultados(key)" />
+        <q-separator class="q-mt-md" v-if="quadrimestresOrdenados.length > 1" />
+        <div class="q-mt-md"></div>
+      </div>
+      <ExameTable class="q-mt-md" :resultados="resultadosPorQuadrimestre" :columns="columns"
+        :buscarResultados="buscarResultados" v-if="semResultado" />
+    </div>
   </q-page>
 </template>
 
@@ -30,6 +79,7 @@
     components: { HeaderDrawer, ExameTable },
     data() {
       return {
+        loading: true, // Controla o estado de carregamento
         semResultado: true,
         resultadosPorQuadrimestre: [], // Aqui será preenchido com dados reais
         columns: [
@@ -62,8 +112,6 @@
     },
 
     computed: {
-      // Computed property para ordenar os quadrimestres
-
       quadrimestresOrdenados() {
         return Object.keys(this.resultadosPorQuadrimestre)
           .sort((a, b) => {
@@ -108,7 +156,6 @@
       getLastDayOfMonth(year, month) {
         return new Date(year, month, 0).getDate();
       },
-      // Buscar os resultados com base nos parâmetros enviados via query
       async buscarResultados() {
         const year = this.$route.query.year;
         const month = this.$route.query.month;
@@ -122,11 +169,10 @@
 
         let start, end;
 
-        // Definir o intervalo de datas com base no quadrimestre selecionado
         if (month) {
           start = `${year}-${month}-01`;
-          const lastDayOfMonth = this.getLastDayOfMonth(year, month); // Pegando o último dia do mês
-          end = `${year}-${month}-${lastDayOfMonth}`; // Inclui o horário para capturar o último dia
+          const lastDayOfMonth = this.getLastDayOfMonth(year, month);
+          end = `${year}-${month}-${lastDayOfMonth}`;
         } else if (this.quadrimestre === "1º") {
           start = `${year}-01-01`;
           end = `${year}-04-30`;
@@ -143,7 +189,6 @@
 
         this.intervaloDatas = { start, end };
 
-        // Consulta no Firestore com base no intervalo de datas
         let q;
 
         if (year) {
@@ -162,7 +207,7 @@
         let resultadosPorQuadrimestre = {};
 
         querySnapshot.forEach((doc) => {
-          const data = new Date(doc.data().dataExame); // Ajuste conforme o nome do campo
+          const data = new Date(doc.data().dataExame);
           const quadrimestre = this.getQuarterFromDate(data);
           const ano = data.getFullYear();
           const key = `${quadrimestre} quadrimestre de ${ano}`;
@@ -192,23 +237,19 @@
             const menorData = new Date(Math.min(...datas));
             const maiorData = new Date(Math.max(...datas));
 
-            // Atribuir as datas ajustadas
-            resultadosPorQuadrimestre[quadrimestre].resultados = resultados; // Atualiza com os resultados ordenados
-            resultadosPorQuadrimestre[quadrimestre].menorData = menorData
-
-            resultadosPorQuadrimestre[quadrimestre].maiorData = maiorData
-
+            resultadosPorQuadrimestre[quadrimestre].resultados = resultados;
+            resultadosPorQuadrimestre[quadrimestre].menorData = menorData;
+            resultadosPorQuadrimestre[quadrimestre].maiorData = maiorData;
           }
         }
 
-        // Preencher os resultados com dados reais
         this.resultadosPorQuadrimestre = resultadosPorQuadrimestre;
+        this.loading = false; // Finaliza o estado de carregamento
       },
 
       gerarResultados(key) {
         const resultadoStore = useResultadoStore();
 
-        // Salvando o resultado no Pinia
         resultadoStore.setResultado({
           key: this.quadrimestresOrdenados[key].key,
           resultados: this.quadrimestresOrdenados[key].resultados,
@@ -216,11 +257,8 @@
           maiorData: this.quadrimestresOrdenados[key].maiorData
         });
 
-        // Redirecionando para a página de resultados
         this.$router.push({ path: '/resultados-exames' });
-
       },
-
     },
   };
 </script>

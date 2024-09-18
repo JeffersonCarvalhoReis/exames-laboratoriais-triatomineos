@@ -1,17 +1,125 @@
 <template>
   <q-page>
     <HeaderDrawer title="resultados" />
-    <p class="text-h5 text-uppercase q-mt-lg q-mx-md">{{ quadrimestre }}</p>
-    <p class="text-bold q-mt-lg q-mx-md">De {{ menorDataFormatada }}
-      até
-      {{ maiorDataFormatada }}</p>
-    <ExameResultadoTable
-      message="Identificação e detecção da infecção natural de triatomíneos quadrimestral (por vigilância ativa -  aplicada pelo SUS)"
-      :resultados="resultados" :columns="columns" />
-    <q-separator class="q-my-md" />
-    <ExameResultadoTable
-      message="PITs - Identificação e detecção da infecção natural de triatomíneos quadrimestral (por vigilância passiva – vigilância popular)"
-      :resultados="resultadosPits" :columns="columns" />
+    <!-- skeleton -->
+    <div v-if="loading" class="q-mt-md">
+      <q-skeleton type="text" class="text-h4" width="300px" />
+      <q-skeleton type="text" width="200px" class="q-my-sm" />
+      <q-skeleton type="text" class="text-subtitle1" width="350px" />
+
+
+      <q-markup-table>
+        <thead>
+          <tr>
+            <th class="text-left" style="width: 150px">
+              <q-skeleton animation="blink" type="text" />
+            </th>
+            <th class="text-left" style="width: 150px">
+              <q-skeleton animation="blink" type="text" />
+            </th>
+            <th class="text-left" style="width: 150px">
+              <q-skeleton animation="blink" type="text" />
+            </th>
+            <th class="text-left" style="width: 150px">
+              <q-skeleton animation="blink" type="text" />
+            </th>
+            <td class="text-left">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+            <td class="text-left">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr v-for="n in 4" :key="n">
+            <td class="text-left">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+            <td class="text-right">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+            <td class="text-left">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+            <td class="text-left">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+            <td class="text-left">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+            <td class="text-left">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+          </tr>
+        </tbody>
+      </q-markup-table>
+      <q-skeleton type="text" class="text-subtitle1 q-my-lg" width="350px" />
+
+      <q-markup-table>
+        <thead>
+          <tr>
+            <th class="text-left" style="width: 150px">
+              <q-skeleton animation="blink" type="text" />
+            </th>
+            <th class="text-left" style="width: 150px">
+              <q-skeleton animation="blink" type="text" />
+            </th>
+            <th class="text-left" style="width: 150px">
+              <q-skeleton animation="blink" type="text" />
+            </th>
+            <th class="text-left" style="width: 150px">
+              <q-skeleton animation="blink" type="text" />
+            </th>
+            <td class="text-left">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+            <td class="text-left">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr v-for="n in 4" :key="n">
+            <td class="text-left">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+            <td class="text-right">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+            <td class="text-left">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+            <td class="text-left">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+            <td class="text-left">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+            <td class="text-left">
+              <q-skeleton animation="blink" type="text" width="85px" />
+            </td>
+          </tr>
+        </tbody>
+      </q-markup-table>
+    </div>
+
+    <!-- conteudo principal -->
+    <div v-else>
+      <p class="text-h5 text-uppercase q-mt-lg q-mx-md">{{ quadrimestre }}</p>
+      <p class="text-bold q-mt-lg q-mx-md">De {{ menorDataFormatada }}
+        até
+        {{ maiorDataFormatada }}</p>
+      <ExameResultadoTable
+        message="Identificação e detecção da infecção natural de triatomíneos quadrimestral (por vigilância ativa -  aplicada pelo SUS)"
+        :resultados="resultados" :columns="columns" />
+      <q-separator class="q-my-md" />
+      <ExameResultadoTable
+        message="PITs - Identificação e detecção da infecção natural de triatomíneos quadrimestral (por vigilância passiva – vigilância popular)"
+        :resultados="resultadosPits" :columns="columns" />
+    </div>
   </q-page>
 </template>
 
@@ -26,6 +134,8 @@
 
     data() {
       return {
+
+        loading: true, // Controla o estado de carregamento
 
         columns: [
           { name: "codigo_ibge", field: "codigo_ibge", label: "Código IBGE" },
@@ -90,7 +200,7 @@
           {
             name: "t_peri_capturado",
             field: "t_peri_capturado",
-            label: "Peri - Capturado",
+            label: "Peri - Capturado - Total",
           },
           {
             name: "a_peri_analisado",
@@ -136,7 +246,6 @@
 
       // Acessando os dados do resultado salvos no Pinia
       const resultado = resultadoStore.resultado;
-      console.log("Resultado completo: ", resultado);
       this.todosResultados = resultado
 
       if (resultado) {
@@ -246,6 +355,8 @@
               groupedResults[especie].t_peri_positivo = groupedResults[especie].a_peri_positivo + groupedResults[especie].n_peri_positivo;
 
             }
+            this.loading = false; // Finaliza o estado de carregamento
+
 
           });
         });

@@ -1,6 +1,57 @@
 <template>
   <div class="q-pa-md">
-    <q-card>
+
+    <q-card flat style="width: 100%" v-if="loading">
+
+      <q-card-section>
+        <q-skeleton type="text" class="text-h6" />
+        <q-separator class="q-my-md" />
+
+        <q-skeleton type="text" width="50%" class="text-subtitle1" />
+        <q-skeleton type="text" class="text-caption" />
+        <q-skeleton type="text" class="text-caption" />
+        <q-skeleton type="text" class="text-caption" />
+        <q-item style="max-width: 300px">
+
+          <q-item-section>
+            <q-item-label>
+              <q-skeleton type="text" />
+            </q-item-label>
+            <q-item-label caption>
+              <q-skeleton type="text" />
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <q-item style="max-width: 300px">
+          <q-item-section>
+            <q-item-label>
+              <q-skeleton type="text" />
+            </q-item-label>
+            <q-item-label caption>
+              <q-skeleton type="text" />
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <q-item style="max-width: 300px">
+          <q-item-section>
+            <q-item-label>
+              <q-skeleton type="text" />
+            </q-item-label>
+            <q-item-label caption>
+              <q-skeleton type="text" />
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-separator class="q-my-md" />
+
+        <q-skeleton type="QBtn" width="170px" />
+
+      </q-card-section>
+    </q-card>
+
+    <q-card v-else>
       <q-card-section>
         <div class="text-h6">Detalhes do Exame</div>
         <q-separator class="q-my-md" />
@@ -56,6 +107,7 @@
     data() {
       return {
         exame: {},
+        loading: true,
       };
     },
     async created() {
@@ -81,6 +133,8 @@
           }
         } catch (error) {
           console.error("Erro ao buscar exame:", error);
+        } finally {
+          this.loading = false;
         }
       },
 

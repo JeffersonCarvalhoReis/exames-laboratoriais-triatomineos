@@ -1,7 +1,44 @@
 <template>
   <HeaderDrawer />
-  <ExameTableExcluidos class="q-mt-md" :resultados="resultados" :columns="columns"
-    :buscarExamesExcluidos="buscarExamesExcluidos" />
+  <!-- skeleton -->
+  <div v-if="loading" class="q-mt-md">
+    <q-markup-table>
+      <thead>
+        <tr>
+          <th class="text-left" style="width: 150px">
+            <q-skeleton animation="blink" type="text" />
+          </th>
+          <th class="text-left" style="width: 150px">
+            <q-skeleton animation="blink" type="text" />
+          </th>
+          <th class="text-left" style="width: 150px">
+            <q-skeleton animation="blink" type="text" />
+          </th>
+
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr v-for="n in 6" :key="n">
+          <td class="text-left">
+            <q-skeleton animation="blink" type="text" width="85px" />
+          </td>
+          <td class="text-right">
+            <q-skeleton animation="blink" type="text" width="85px" />
+          </td>
+          <td class="text-left">
+            <q-skeleton animation="blink" type="text" width="85px" />
+          </td>
+        </tr>
+      </tbody>
+    </q-markup-table>
+
+  </div>
+  <!-- conteudo -->
+  <div v-else>
+    <ExameTableExcluidos class="q-mt-md" :resultados="resultados" :columns="columns"
+      :buscarExamesExcluidos="buscarExamesExcluidos" />
+  </div>
 </template>
 
 <script>
@@ -14,6 +51,8 @@
     components: { HeaderDrawer, ExameTableExcluidos },
     data() {
       return {
+        loading: true, // Controla o estado de carregamento
+
         resultados: [],
         columns: [
           {
@@ -57,6 +96,9 @@
           this.resultados = resultados;
         } catch (error) {
           console.error("Erro ao buscar exames excluídos:", error);
+        } finally {
+          this.loading = false; // Finaliza o estado de carregamento
+
         }
       },
     },

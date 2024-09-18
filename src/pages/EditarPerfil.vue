@@ -61,6 +61,14 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <q-dialog v-model="loading" persistent>
+      <q-card class="q-dialog-plugin">
+        <q-card-section class="q-pa-md" align="center">
+          <q-spinner color="primary" size="50px" />
+          <div class="q-mt-md">Atualizando perfil...</div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -86,6 +94,7 @@
       const errorMessage = ref("");
       const confirmPassword = ref('');
       const form = ref(null);
+      const loading = ref(false)
 
       const errorMessages = {
         'auth/email-already-in-use': 'O e-mail informado já está em uso.',
@@ -109,6 +118,7 @@
 
       // Função de submit
       const onSubmit = async () => {
+        loading.value = true;
         try {
           // Atualizar o nome do usuário e foto de perfil
           if (displayName.value !== user.displayName) {
@@ -138,6 +148,8 @@
 
           errorMessage.value = errorMessages[error.code] || 'Ocorreu um erro desconhecido.';
           errorDialog.value = true;
+        } finally {
+          loading.value = false; // Encerra o carregamento
         }
       };
       const validateForm = () => {
@@ -167,7 +179,8 @@
         confirmDialog,
         errorMessage,
         validateForm,
-        form
+        form,
+        loading
       };
     },
   };

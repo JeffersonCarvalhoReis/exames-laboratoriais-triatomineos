@@ -19,7 +19,7 @@
             <div class="row q-gutter-lg">
               <q-input v-model="numeroEtiqueta" :type="pit == 'sim' ? 'string' : 'number'" label="Nº da etiqueta"
                 :readonly="pit === 'sim'" :rules="[(val) => etiquetaObrigatoria(val)]" lazy-rules @click="pitSim"
-                class="q-mb-md col-md-2 col-11" required ref="numeroEtiquetaInput" />
+                class="q-mb-md col-md-2 col-11" ref="numeroEtiquetaInput" />
 
               <!-- Data do exame -->
               <q-input v-model="dataExame" class="col-md-2 col-11">
@@ -55,8 +55,8 @@
           <q-card-section>
             <div class="q-gutter-md">
               <!-- Espécie de triatomíneos -->
-              <q-input v-model="exame.codigo" type="number" label="Código da espécie de triatomíneos" class="q-mb-md"
-                :rules="[(val) => !!val || 'Código da espécie é obrigatório']" required lazy-rules />
+              <q-input v-model="exame.codigo" type="number" ref="codigoInput" label="Código da espécie de triatomíneos"
+                class="q-mb-md" :rules="[(val) => !!val || 'Código da espécie é obrigatório']" required lazy-rules />
               <q-input filled v-model="exame.nome" label="Nome espécie de triatomíneos" placeholder="Nome da espécie"
                 class="q-mb-md" readonly />
 
@@ -125,8 +125,31 @@
         <h6 class="titleAdd">Adicionar novo exame</h6>
         <q-btn round color="primary" icon="add" @click="adicionarExame" push class="q-ma-md" size="lg" />
       </q-card>
-      <q-btn push type="submit" label="Enviar" icon="fa-solid fa-cloud-arrow-up" color="primary"
+      <q-btn push label="Enviar" @click="confirmaEnvio = true" icon="fa-solid fa-cloud-arrow-up" color="primary"
         class="q-ma-md q-px-lg" />
+      <q-dialog v-model="confirmaEnvio" persistent>
+        <q-card class="q-dialog-plugin" style="min-width: 300px">
+          <q-card-section>
+            <div class="text-h6">Confirmar Envio</div>
+            <div class="q-mt-md">
+              Você realmente deseja confirmar o envio dos exames?
+            </div>
+          </q-card-section>
+          <q-card-actions align="right">
+            <q-btn flat v-close-popup label="Cancelar" color="negative" />
+            <q-btn @click="btnConfirmar" v-close-popup flat label="Confirmar" color="positive" />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+
+      <q-dialog v-model="loading" persistent>
+        <q-card class="q-dialog-plugin">
+          <q-card-section class="q-pa-md" align="center">
+            <q-spinner color="primary" size="50px" />
+            <div class="q-mt-md">Enviando dados...</div>
+          </q-card-section>
+        </q-card>
+      </q-dialog>
     </q-form>
   </div>
 </template>
@@ -144,6 +167,8 @@
         numeroEtiqueta: "",
         dataExame: formatarData(new Date()),
         responsavel: useUserStore().usuario,
+        confirmaEnvio: false,
+        loading: false,
         exames: [
           {
             codigo: "",
@@ -206,6 +231,30 @@
     },
 
     methods: {
+      btnConfirmar() {
+        if (!this.verifcaEtiqueta()) {
+          this.$refs.numeroEtiquetaInput.focus();
+          this.$nextTick(() => {
+            const inputElement =
+              this.$refs.numeroEtiquetaInput.$el.querySelector("input");
+            if (inputElement) {
+              inputElement.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              });
+            }
+          });
+          this.$q.notify({
+            type: "negative",
+            timeout: 4500,
+            message: "Preencha o campo número da etiqueta",
+          });
+        }
+
+        this.confirmaEnvio = false;
+        document.querySelector('form').dispatchEvent(new Event('submit'));
+
+      },
       formattedDate(data) {
         const [day, month, year] = data.split("/");
         return `${year}-${month}-${day}`;
@@ -216,36 +265,21 @@
       },
       verificarCamposObrigatorios() {
         return (
-          this.exames.every((exame) => exame.codigo && exame.nome) &&
-          this.numeroEtiqueta
+          this.exames.every((exame) => exame.codigo && exame.nome)
         );
       },
+      verifcaEtiqueta() {
+
+        return this.numeroEtiqueta
+
+      },
       async salvarExame() {
-        if (!this.numeroEtiqueta) {
-          this.$refs.numeroEtiquetaInput.focus();
-          this.$nextTick(() => {
-            const inputElement =
-              this.$refs.numeroEtiquetaInput.$el.querySelector("input");
-            if (inputElement) {
-              inputElement.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-              });
-              inputElement.focus();
-            }
-          });
-          this.$q.notify({
-            type: "negative",
-            timeout: 4500,
-            message: "Preencha o campo número da etiqueta",
-          });
-          return;
-        }
+
         if (!this.verificarCamposObrigatorios()) {
           this.$q.notify({
             type: "negative",
             timeout: 3500,
-            message: "Todos os campos devem ser preenchidos.",
+            message: "Preencha o campo Código da espécie",
           });
           return;
         }
@@ -261,6 +295,8 @@
           });
           return;
         }
+        this.loading = true; // Começa o carregamento
+
         try {
           // Coleção "exames" no Firestore
           const docRef = await addDoc(collection(db, "exames"), {
@@ -286,6 +322,8 @@
             message: "Erro ao salvar exame.",
             type: "negative",
           });
+        } finally {
+          this.loading = false; // Encerra o carregamento
         }
       },
       etiquetaPit() {
@@ -360,9 +398,10 @@
       verificaEstagio(newVal) {
         newVal.forEach((estagio, index) => {
           if (index < this.exames.length) {
-            // Atualiza o nome da espécie baseado no código ou define um nome padrão
+            // Define o resultado dependendo do valor de "estagio"
             this.exames[index].resultado =
-              estagio === "ninfa" ? "nao-examinado" : "negativo";
+              estagio === "ninfa" ? "nao-examinado" : this.exames[index].resultado;
+
           }
         });
       },
@@ -395,5 +434,26 @@
 <style scoped>
   .titleAdd {
     margin: 0;
+  }
+
+  .q-dialog-plugin {
+    background-color: #fff;
+    /* Cor de fundo branca para uma aparência limpa */
+    border-radius: 8px;
+    /* Bordas arredondadas */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Sombra suave */
+  }
+
+  .q-card-section {
+    padding: 16px;
+    /* Padding interno */
+  }
+
+  .q-card-actions {
+    border-top: 1px solid #ddd;
+    /* Linha separadora */
+    padding: 8px;
+    /* Padding interno */
   }
 </style>
