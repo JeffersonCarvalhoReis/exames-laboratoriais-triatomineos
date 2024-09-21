@@ -1,11 +1,12 @@
 <template>
   <div class="q-table-container q-m-lg">
     <p class="q-mx-md">{{ message }}</p>
-    <q-table :grid="$q.screen.lt.sm" bordered :rows="resultados" :columns="columns" row-key="codigo_ibge" flat
-      :virtual-scroll="true" dense separator="cell">
-      <template v-slot:body-cell="{ row, col }">
-        <q-td>{{ row[col.field] }}</q-td>
-      </template>
+    <q-table bordered :rows="resultados" :columns="columns" row-key="codigo_ibge" flat :virtual-scroll="true" dense
+      separator="cell" :rows-per-page-options="[0]" class="zebra-table">
+      <template v-slot:body-cell="{ row, col, rowIndex }">
+        <q-td :class="{ 'odd-row': rowIndex % 2 === 0, 'even-row': rowIndex % 2 !== 0 }">
+          {{ row[col.field] }}
+        </q-td> </template>
       <template v-slot:header="">
         <q-tr :props="prop">
           <q-th rowspan="4">Cód. IBGE</q-th>
@@ -69,4 +70,13 @@
     max-width: 100%;
     overflow-x: auto;
   }
+
+  .odd-row {
+    background-color: #f5f5f5;
+  }
+
+  .even-row {
+    background-color: #fff;
+  }
+
 </style>

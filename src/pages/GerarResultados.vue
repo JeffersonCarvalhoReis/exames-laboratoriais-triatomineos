@@ -108,6 +108,12 @@
     },
 
     async mounted() {
+      console.log(
+
+        this.$route.query.year,
+        this.$route.query.month,
+        this.$route.query.quarter
+      )
       await this.buscarResultados();
     },
 
@@ -142,6 +148,7 @@
 
     methods: {
       getQuarterFromDate(date) {
+
         const month = date.getMonth() + 1; // Months are 0-based
         if (month >= 1 && month <= 4) return "1º";
         if (month >= 5 && month <= 8) return "2º";
@@ -208,6 +215,7 @@
 
         querySnapshot.forEach((doc) => {
           const data = new Date(doc.data().dataExame);
+          data.setHours(data.getHours() + 3)
           const quadrimestre = this.getQuarterFromDate(data);
           const ano = data.getFullYear();
           const key = `${quadrimestre} quadrimestre de ${ano}`;

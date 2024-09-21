@@ -308,7 +308,7 @@
 
             // Somar os adultos, ninfas e total capturados no intra
             if (exame.captura === 'intra') {
-              if (exame.estagio === 'adulto') {
+              if (exame.estagio === 'adulto-macho' || exame.estagio === 'adulto-femea' || exame.estagio === 'adulto') {
                 groupedResults[especie].a_intra_capturado += 1;
                 if (exame.resultado != 'nao-examinado') {
                   groupedResults[especie].a_intra_analisado += 1;
@@ -333,7 +333,7 @@
 
             // Somar os adultos, ninfas e total capturados no peri
             if (exame.captura === 'peri') {
-              if (exame.estagio === 'adulto') {
+              if (exame.estagio === 'adulto-macho' || exame.estagio === 'adulto-femea' || exame.estagio === 'adulto') {
                 groupedResults[especie].a_peri_capturado += 1;
                 if (exame.resultado != 'nao-examinado') {
                   groupedResults[especie].a_peri_analisado += 1;
@@ -370,4 +370,4 @@
 
 </script>
 
-<style></style>
+<style scoped></style>

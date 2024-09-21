@@ -79,9 +79,12 @@
               </q-item-label>
               <q-item-label><strong>Nome:</strong> <span class="text-uppercase">{{ item.nome }}</span>
               </q-item-label>
-              <q-item-label><strong>Resultado:</strong> <span class="text-uppercase">{{ item.resultado }}</span>
+              <q-item-label><strong>Resultado:</strong> <span class="text-uppercase"> {{
+                item.resultado == "nao-examinado" ? "não examinado" : item.resultado }}</span>
               </q-item-label>
-              <q-item-label><strong>Estágio:</strong> <span class="text-uppercase">{{ item.estagio }}</span>
+              <q-item-label><strong>Estágio:</strong> <span class="text-uppercase">{{
+                (item.estagio == "adulto-macho" || item.estagio == "adulto") ? "adulto macho"
+                  : item.estagio == "adulto-femea" ? "adulto fêmea" : item.estagio }}</span>
               </q-item-label>
               <q-item-label><strong>Captura:</strong> <span class="text-uppercase">{{ item.captura }}</span>
               </q-item-label>
@@ -118,7 +121,8 @@
       dataExameFormatada() {
         const data = this.exame.dataExame
         return formatarData(data)
-      }
+      },
+
     },
     methods: {
       async buscarExame(id) {

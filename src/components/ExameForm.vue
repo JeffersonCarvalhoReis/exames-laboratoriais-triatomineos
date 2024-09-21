@@ -1,5 +1,6 @@
 <template>
   <div class="q-pa-md">
+    <a href="#top" id="top"></a>
     <!-- Seção 1: Dados de Identificação -->
     <q-card class="q-pa-md q-mb-md">
       <q-card-section>
@@ -7,7 +8,7 @@
       </q-card-section>
 
       <q-card-section>
-        <q-form @submit.prevent="salvarExame">
+        <q-form>
           <div>
             <!-- PIT -->
             <q-field label="PIT:" stack-label>
@@ -42,7 +43,7 @@
     </q-card>
 
     <!-- Seção 2: Dados sobre Exame de Triatomíneos -->
-    <q-form @submit.prevent="salvarExame">
+    <q-form>
       <q-card class="q-pa-md q-mb-md" v-for="(exame, index) in exames" :key="index">
         <q-card-section v-show="index == 0">
           <div class="text-h6">2. Dados sobre Exame de Triatomíneos</div>
@@ -85,7 +86,10 @@
                         <q-radio v-model="exame.estagio" val="ninfa" label="NINFA" />
                       </div>
                       <div class="col-auto">
-                        <q-radio v-model="exame.estagio" val="adulto" label="ADULTO" />
+                        <q-radio v-model="exame.estagio" val="adulto-macho" label="ADULTO MACHO" />
+                      </div>
+                      <div class="col-auto">
+                        <q-radio v-model="exame.estagio" val="adulto-femea" label="ADULTO FÊMEA" />
                       </div>
                     </div>
                   </div>
@@ -127,7 +131,7 @@
       </q-card>
       <q-btn push label="Enviar" @click="confirmaEnvio = true" icon="fa-solid fa-cloud-arrow-up" color="primary"
         class="q-ma-md q-px-lg" />
-      <q-dialog v-model="confirmaEnvio" persistent>
+      <q-dialog v-model="confirmaEnvio" persistent @close="confirmaEnvio = false">
         <q-card class="q-dialog-plugin" style="min-width: 300px">
           <q-card-section>
             <div class="text-h6">Confirmar Envio</div>
@@ -137,7 +141,7 @@
           </q-card-section>
           <q-card-actions align="right">
             <q-btn flat v-close-popup label="Cancelar" color="negative" />
-            <q-btn @click="btnConfirmar" v-close-popup flat label="Confirmar" color="positive" />
+            <q-btn @click="btnConfirmar" flat label="Confirmar 8" color="positive" />
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -155,10 +159,12 @@
 </template>
 
 <script>
+  import SmoothScroll from "smooth-scroll";
   import { useUserStore } from "src/stores/userStore";
   import { db } from "src/firebaseConfig";
   import { collection, addDoc } from "firebase/firestore";
   import { formatarData } from "src/utils/dateUtils";
+
   export default {
     data() {
       return {
@@ -168,13 +174,14 @@
         dataExame: formatarData(new Date()),
         responsavel: useUserStore().usuario,
         confirmaEnvio: false,
+        enviando: false,
         loading: false,
         exames: [
           {
             codigo: "",
             nome: "",
             captura: "peri",
-            estagio: "adulto",
+            estagio: "adulto-macho",
             resultado: "negativo",
           },
         ],
@@ -230,18 +237,38 @@
       };
     },
 
+    mounted() {
+      // Inicializa o smooth-scroll
+      const scroll = new SmoothScroll('a[href*="#"]', {
+        speed: 300,
+        speedAsDuration: true,
+      });
+    },
+
     methods: {
-      btnConfirmar() {
+      scrollToTop() {
+        setTimeout(() => {
+          const section = document.getElementById("top");
+          if (section) {
+            section.scrollIntoView({
+              behavior: "smooth",
+              block: "end",
+            });
+          }
+        }, 200);
+      },
+      async btnConfirmar() {
+        if (this.enviando) {
+          return;
+        }
+        this.enviando = true;
         if (!this.verifcaEtiqueta()) {
           this.$refs.numeroEtiquetaInput.focus();
           this.$nextTick(() => {
             const inputElement =
               this.$refs.numeroEtiquetaInput.$el.querySelector("input");
             if (inputElement) {
-              inputElement.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-              });
+              this.scrollToTop();
             }
           });
           this.$q.notify({
@@ -249,11 +276,29 @@
             timeout: 4500,
             message: "Preencha o campo número da etiqueta",
           });
+          this.confirmaEnvio = false;
+          this.enviando = false;
+          return;
         }
-
+        if (!this.verificarCamposObrigatorios()) {
+          this.$q.notify({
+            type: "negative",
+            timeout: 3500,
+            message: "Preencha o campo Código da espécie",
+          });
+          this.confirmaEnvio = false;
+          this.enviando = false;
+          return;
+        }
         this.confirmaEnvio = false;
-        document.querySelector('form').dispatchEvent(new Event('submit'));
+        try {
+          await this.salvarExame();
 
+          this.scrollToTop();
+        } finally {
+          this.enviando = false;
+        }
+        // document.querySelector("form").dispatchEvent(new Event("submit"));
       },
       formattedDate(data) {
         const [day, month, year] = data.split("/");
@@ -264,25 +309,12 @@
         this.$refs.numeroEtiquetaInput.resetValidation();
       },
       verificarCamposObrigatorios() {
-        return (
-          this.exames.every((exame) => exame.codigo && exame.nome)
-        );
+        return this.exames.every((exame) => exame.codigo && exame.nome);
       },
       verifcaEtiqueta() {
-
-        return this.numeroEtiqueta
-
+        return this.numeroEtiqueta;
       },
       async salvarExame() {
-
-        if (!this.verificarCamposObrigatorios()) {
-          this.$q.notify({
-            type: "negative",
-            timeout: 3500,
-            message: "Preencha o campo Código da espécie",
-          });
-          return;
-        }
         const codigosInvalidos = this.codigosExames.filter(
           (codigo) => !this.especies[codigo]
         );
@@ -307,10 +339,11 @@
             exames: this.exames,
             deleted: false, // Salva todos os exames de uma vez
           });
-          window.scrollTo({
-            top: 0, // Define o topo da página
-            behavior: "smooth", // Suaviza o efeito de rolagem
-          });
+
+          // window.scrollTo({
+          //   top: 0, // Define o topo da página
+          //   behavior: "smooth", // Suaviza o efeito de rolagem
+          // });
           this.$q.notify({
             message: "Exame salvo com sucesso!",
             type: "positive",
@@ -323,6 +356,7 @@
             type: "negative",
           });
         } finally {
+          this.confirmaEnvio = false;
           this.loading = false; // Encerra o carregamento
         }
       },
@@ -350,7 +384,7 @@
             codigo: "",
             nome: "",
             captura: "peri",
-            estagio: "adulto",
+            estagio: "adulto-macho",
             resultado: "negativo",
           },
         ];
@@ -370,12 +404,17 @@
       },
 
       adicionarExame() {
+        const scrollPos = window.scrollY;
+
         this.exames.push({
           codigo: "",
           nome: "",
           captura: "peri",
-          estagio: "adulto",
+          estagio: "adulto-macho",
           resultado: "negativo",
+        });
+        this.$nextTick(() => {
+          window.scrollTo(0, scrollPos);
         });
         this.addNotif();
       },
@@ -400,8 +439,9 @@
           if (index < this.exames.length) {
             // Define o resultado dependendo do valor de "estagio"
             this.exames[index].resultado =
-              estagio === "ninfa" ? "nao-examinado" : this.exames[index].resultado;
-
+              estagio === "ninfa"
+                ? "nao-examinado"
+                : this.exames[index].resultado;
           }
         });
       },

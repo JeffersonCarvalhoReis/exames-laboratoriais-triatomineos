@@ -111,8 +111,9 @@
 
         examsSnapshot.forEach((doc) => {
           const examData = doc.data();
-          const examMonth =
-            new Date(examData.dataExame).getMonth() + 1;
+          const date = new Date(examData.dataExame);
+          date.setHours(date.getHours() + 3);
+          const examMonth = date.getMonth() + 1;
           const quarter = this.getQuarterFromMonth(examMonth);
           quarterSet.add(quarter);
         });
