@@ -55,9 +55,16 @@
           De {{ exames.menorData }} até
           {{ exames.maiorData }}
         </div>
+
         <ExameTable class="q-mt-md" :resultados="exames.resultados" :columns="columns"
           :buscarResultados="buscarResultados" />
-        <q-btn label="Gerar Resultados" color="secondary" @click="gerarResultados(key)" />
+        <div class="row no-wrap">
+          <q-btn label="Gerar Resultados" color="secondary" @click="gerarResultados(key)" />
+          <q-space />
+          <q-btn label="gerar pdf" icon="fa-regular fa-file-pdf" color="secondary" @click="gerarPDF(exames.key)" />
+        </div>
+
+
         <q-separator class="q-mt-md" v-if="quadrimestresOrdenados.length > 1" />
         <div class="q-mt-md"></div>
       </div>
@@ -74,6 +81,7 @@
   import { formatarData } from "src/utils/dateUtils";
   import HeaderDrawer from "src/components/HeaderDrawer.vue";
   import ExameTable from "src/components/ExameTable.vue";
+  import { jsPDF } from "jspdf";
 
   export default {
     components: { HeaderDrawer, ExameTable },
@@ -108,12 +116,7 @@
     },
 
     async mounted() {
-      console.log(
 
-        this.$route.query.year,
-        this.$route.query.month,
-        this.$route.query.quarter
-      )
       await this.buscarResultados();
     },
 
@@ -147,6 +150,265 @@
     },
 
     methods: {
+
+      async gerarPDF(key) {
+        // Coleta todos os resultados
+        // Obtém o quadrimestre correspondente ao key
+        console.log(key)
+        const quadrimestreSelecionado = this.quadrimestresOrdenadosFormatados.find(exame => exame.key === key);
+
+        // Filtra os resultados que pertencem ao mesmo quadrimestre
+        const resultadosDoQuadrimestre = this.quadrimestresOrdenadosFormatados.filter(exame => {
+          return exame.key === quadrimestreSelecionado.key;
+        });
+
+        const self = this;
+        resultadosDoQuadrimestre.forEach(exame => {
+          self.gerarPDFPorExame(exame);
+        });
+      },
+      quebrarLinhaSeNecessario(texto) {
+        // Verifica se o texto tem mais de 20 caracteres
+        if (texto.length > 18) {
+          // Encontra o primeiro espaço após o caractere 20
+          const indexEspaco = texto.indexOf(' ', 1);
+
+          // Se houver um espaço após o caractere 20, quebra a linha
+          if (indexEspaco !== -1) {
+            // Retorna o texto com uma quebra de linha na posição do espaço
+            return texto.slice(0, indexEspaco) + '\n ' + texto.slice(indexEspaco + 1);
+          }
+        }
+
+        // Se não houver um espaço ou o texto for curto, retorna o texto original
+        return texto;
+      },
+      gerarPDFPorExame(exame) {
+
+        const doc = new jsPDF();
+        const margemEsquerda = 15;
+        const margemDireita = 195; // 210mm largura total menos 15mm de margem
+        const primeiroDist = 71;
+        const segundaDist = 103;
+        const terceiraDist = 150;
+        const alturaPagina = doc.internal.pageSize.getHeight(); // altura da página
+        const espacamentoAssinatura = 30; // Espaço reservado para assinaturas no final
+        const alturaLinha = 5;
+        let y = 15; // Posição inicial no eixo Y
+
+
+        exame.resultados.forEach((resultado, index) => {
+          // Cabeçalho
+          const textoFS = 'FS - FUNDAÇÃO NACIONAL DE SAÚDE';
+          const textoPCDC = 'PROGRAMA DE CONTROLE DA DOENÇA DE CHAGAS';
+          const textoForm = 'FORMULÁRIO DE EXAME DE TRIATOMÍNEOS'
+          // Definir a fonte e o tamanho (opcional)
+          doc.setFontSize(10);
+
+          // Calcula a largura do texto
+          const textFSWidth = doc.getTextWidth(textoFS);
+          const textPCDCWidth = doc.getTextWidth(textoPCDC);
+          // Largura do PDF (padrão A4 é 210mm)
+          const pageWidth = doc.internal.pageSize.getWidth();
+
+          // Calcula a posição X para centralizar o texto
+          const xFS = (pageWidth - textFSWidth) / 2;
+          const xPCDC = (pageWidth - textPCDCWidth) / 2;
+
+          // Insere o texto no PDF na posição centralizada
+          doc.text(textoFS, xFS, y);
+          y += 5;
+          doc.text(textoPCDC, xPCDC, y);
+          y += 7;
+          doc.setFontSize(14);
+
+          const textFormWidth = doc.getTextWidth(textoForm);
+          const xFORM = (pageWidth - textFormWidth) / 2;
+          doc.text(textoForm, xFORM, y);
+          y += 7;
+          doc.rect(15, 10, 180, 20, 'S');  // retangulo do cabeçalho
+
+          doc.setFontSize(10);
+          doc.text("1 - Dados de Identificação", margemEsquerda, y);
+          y += alturaLinha;
+          doc.text("Número da Etiqueta", margemEsquerda + 8, y);
+          doc.text("Data do Exame", 71, y + 2);
+          doc.text("Responsável pelo Exame", 125, y);
+          y += alturaLinha;
+          doc.text(`${resultado.numeroEtiqueta}`, margemEsquerda + 20, y + 3);
+          doc.text(`${formatarData(resultado.dataExame)}`, 74, y + 3);
+          doc.text(`${resultado.responsavel}`, 110, y + 3);
+
+          doc.rect(margemEsquerda, 36, 50, 12, 'S') //retangulo do numero da etiqueta
+          doc.rect(68, 36, 30, 12, 'S') //retangulo da data do exame
+          doc.rect(100, 36, 95, 12, 'S') //retangulo do nome do responsavel
+
+
+          y += alturaLinha + 3;
+
+
+          doc.text("2 - Dados sobre exame de triatomíneos", margemEsquerda, y);
+          y += alturaLinha;
+
+          // Iterar sobre os dados para preencher a tabela
+          if (resultado.exames && resultado.exames.length > 0) {
+
+            let rect = 53 //define posição y inicial dos retangulos
+            // Itera sobre os exames e exibe os detalhes
+            resultado.exames.forEach((exameDetalhe, exameIndex) => {
+              // doc.text(`  Exame ${exameIndex + 1}:`, margemEsquerda, y);
+              // y += alturaLinha;
+              doc.text(`Espécie de triatomíneos`, margemEsquerda + 5, y);
+
+              doc.rect(margemEsquerda, rect, 50, 22, 'S')//retangulo da Espécie de triatomíneos
+              doc.rect(68, rect, 30, 22, 'S')//retangulo da Captura
+              doc.rect(100, rect, 45, 22, 'S')//retangulo do Estágio
+              doc.rect(147, rect, 50, 22, 'S')//retangulo do Resultado
+
+              doc.rect(margemEsquerda + 1, rect + 5, 15, 15, 'S')//retangulo do código
+              doc.rect(margemEsquerda + 17, rect + 5, 32, 15, 'S')//retangulo do nome da especie
+
+              doc.rect(69, rect + 6, 5, 4, 'S')//retangulo de seleção de captura
+              doc.rect(69, rect + 16, 5, 4, 'S')//retangulo de seleção de captura
+
+              doc.rect(101, rect + 6, 5, 4, 'S')//retangulo de seleção de estágio
+              doc.rect(101, rect + 11, 5, 4, 'S')//retangulo de seleção de estágio
+              doc.rect(101, rect + 16, 5, 4, 'S')//retangulo de seleção de estágio
+
+              doc.rect(148, rect + 6, 5, 4, 'S')//retangulo de seleção de resultado
+              doc.rect(148, rect + 11, 5, 4, 'S')//retangulo de seleção de resultado
+              doc.rect(148, rect + 16, 5, 4, 'S')//retangulo de seleção de resultado
+              rect += 25
+
+              doc.text(`Captura`, primeiroDist + 5, y);
+              doc.text(`Estágio`, segundaDist + 10, y);
+              doc.text(`Resultado`, terceiraDist + 5, y);
+
+              y += alturaLinha;
+              doc.setFontSize(7);
+              doc.text(`Código`, margemEsquerda + 4, y);
+
+              doc.setFontSize(10);
+              doc.text(` Nome`, 42, y);
+              doc.text(`${exameDetalhe.captura == "intra" ? "X  " : "    "} 1 - Intra`, primeiroDist - 1, y);
+              doc.text(`${exameDetalhe.estagio == "ninfa" ? "X  " : "    "} 1 - Ninfa`, segundaDist - 1, y);
+              doc.text(`${exameDetalhe.resultado == "positivo" ? "X  " : "    "} 1 - Positivo`, terceiraDist - 1, y);
+              y += alturaLinha;
+
+              doc.text(` ${exameDetalhe.codigo}`, margemEsquerda + 5, y);
+              doc.text(` ${this.quebrarLinhaSeNecessario(exameDetalhe.nome)}`, 32, y);
+              doc.text(`${exameDetalhe.estagio == "adulto-macho" || exameDetalhe.estagio == "adulto" ? "X  " : "    "} 2 - Adulto Macho`, segundaDist - 1, y);
+              doc.text(`${exameDetalhe.resultado == "negativo" ? "X  " : "    "} 2 - Negativo`, terceiraDist - 1, y);
+              y += alturaLinha;
+
+              doc.text(`${exameDetalhe.captura == "peri" ? "X  " : "    "} 2 - Peri`, primeiroDist - 1, y);
+              doc.text(`${exameDetalhe.estagio == "adulto-femea" ? "X  " : "    "} 3 - Adulto Fêmea`, segundaDist - 1, y);
+              doc.text(`${exameDetalhe.resultado == "nao-examinado" ? "X  " : "    "} 3 - Não Examinado`, terceiraDist - 1, y);
+              y += alturaLinha + 5;
+
+              //acresenta mais uma pagina se o conteudo ultrapassar uma pagina
+              if (y + espacamentoAssinatura > alturaPagina - 20) {
+                this.adicionarAssinaturas(doc, margemEsquerda, margemDireita, alturaPagina - espacamentoAssinatura);
+
+                doc.addPage();
+                y = 15
+                const textoFS = 'FS - FUNDAÇÃO NACIONAL DE SAÚDE';
+                const textoPCDC = 'PROGRAMA DE CONTROLE DA DOENÇA DE CHAGAS';
+                const textoForm = 'FORMULÁRIO DE EXAME DE TRIATOMÍNEOS'
+                // Definir a fonte e o tamanho (opcional)
+                doc.setFontSize(10);
+
+                // Calcula a largura do texto
+                const textFSWidth = doc.getTextWidth(textoFS);
+                const textPCDCWidth = doc.getTextWidth(textoPCDC);
+                // Largura do PDF (padrão A4 é 210mm)
+                const pageWidth = doc.internal.pageSize.getWidth();
+
+                // Calcula a posição X para centralizar o texto
+                const xFS = (pageWidth - textFSWidth) / 2;
+                const xPCDC = (pageWidth - textPCDCWidth) / 2;
+
+                // Insere o texto no PDF na posição centralizada
+                doc.text(textoFS, xFS, y);
+                y += 5;
+                doc.text(textoPCDC, xPCDC, y);
+                y += 7;
+                doc.setFontSize(14);
+
+                const textFormWidth = doc.getTextWidth(textoForm);
+                const xFORM = (pageWidth - textFormWidth) / 2;
+                doc.text(textoForm, xFORM, y);
+                y += 7;
+                doc.rect(15, 10, 180, 20, 'S');  // retangulo do cabeçalho
+
+                doc.setFontSize(10);
+                doc.text("1 - Dados de Identificação", margemEsquerda, y);
+                y += alturaLinha;
+                doc.text("Número da Etiqueta", margemEsquerda + 8, y);
+                doc.text("Data do Exame", 71, y + 2);
+                doc.text("Responsável pelo Exame", 125, y);
+                y += alturaLinha;
+                doc.text(`${resultado.numeroEtiqueta}`, margemEsquerda + 20, y + 3);
+                doc.text(`${formatarData(resultado.dataExame)}`, 74, y + 3);
+                doc.text(`${resultado.responsavel}`, 110, y + 3);
+
+                doc.rect(margemEsquerda, 36, 50, 12, 'S') //retangulo do numero da etiqueta
+                doc.rect(68, 36, 30, 12, 'S') //retangulo da data do exame
+                doc.rect(100, 36, 95, 12, 'S') //retangulo do nome do responsavel
+
+
+                y += alturaLinha + 3;
+
+
+                doc.text("2 - Dados sobre exame de triatomíneos", margemEsquerda, y);
+                y += alturaLinha;  // Redesenha o cabeçalho
+                rect = 53
+                doc.rect(margemEsquerda, rect, 50, 22, 'S')//retangulo da Espécie de triatomíneos
+                doc.rect(68, rect, 30, 22, 'S')//retangulo da Captura
+                doc.rect(100, rect, 45, 22, 'S')//retangulo do Estágio
+                doc.rect(147, rect, 50, 22, 'S')//retangulo do Resultado
+
+                doc.rect(margemEsquerda + 1, rect + 5, 15, 15, 'S')//retangulo do código
+                doc.rect(margemEsquerda + 17, rect + 5, 32, 15, 'S')//retangulo do nome da especie
+
+                doc.rect(69, rect + 6, 5, 4, 'S')//retangulo de seleção de captura
+                doc.rect(69, rect + 16, 5, 4, 'S')//retangulo de seleção de captura
+
+                doc.rect(101, rect + 6, 5, 4, 'S')//retangulo de seleção de estágio
+                doc.rect(101, rect + 11, 5, 4, 'S')//retangulo de seleção de estágio
+                doc.rect(101, rect + 16, 5, 4, 'S')//retangulo de seleção de estágio
+
+                doc.rect(148, rect + 6, 5, 4, 'S')//retangulo de seleção de resultado
+                doc.rect(148, rect + 11, 5, 4, 'S')//retangulo de seleção de resultado
+                doc.rect(148, rect + 16, 5, 4, 'S')//retangulo de seleção de resultado
+                y = 57; // Reseta a posição vertical
+              }
+            });
+          }
+          this.adicionarAssinaturas(doc, margemEsquerda, margemDireita, alturaPagina - espacamentoAssinatura);
+
+          //uma pagina por resultado
+          if (index < exame.resultados.length - 1) {
+            doc.addPage();
+
+            y = 15;
+          }
+        });
+
+        doc.save(`Exames do ${exame.key}.pdf`);
+
+      },
+      adicionarAssinaturas(doc, margemEsquerda, margemDireita, posicaoY) {
+        const larguraAssinatura = 80;
+
+        // Campo de assinatura 1
+        doc.line(margemEsquerda, posicaoY, margemEsquerda + larguraAssinatura, posicaoY); // Linha para a assinatura
+        doc.text("Supervisor", margemEsquerda, posicaoY + 5); // Texto "Assinatura 1"
+
+        // Campo de assinatura 2
+        doc.line(margemDireita - larguraAssinatura, posicaoY, margemDireita, posicaoY); // Linha para a assinatura
+        doc.text("Responsável pelos exames", margemDireita - larguraAssinatura, posicaoY + 5); // Texto "Assinatura 2"
+      },
       getQuarterFromDate(date) {
 
         const month = date.getMonth() + 1; // Months are 0-based

@@ -141,7 +141,7 @@
           </q-card-section>
           <q-card-actions align="right">
             <q-btn flat v-close-popup label="Cancelar" color="negative" />
-            <q-btn @click="btnConfirmar" flat label="Confirmar 8" color="positive" />
+            <q-btn @click="btnConfirmar" flat label="Confirmar" color="positive" />
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -171,7 +171,7 @@
         pitAtivo: false,
         pit: "não",
         numeroEtiqueta: "",
-        dataExame: formatarData(new Date()),
+        dataExame: new Date().toLocaleDateString("pt-BR"),
         responsavel: useUserStore().usuario,
         confirmaEnvio: false,
         enviando: false,

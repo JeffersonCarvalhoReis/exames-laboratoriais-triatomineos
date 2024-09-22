@@ -20,6 +20,8 @@
     "@quasar/extras": "^1.16.4",
     "axios": "^1.2.1",
     "firebase": "^10.13.1",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.3",
     "pinia": "^2.2.2",
     "pinia-plugin-persistedstate": "^4.0.1",
     "quasar": "^2.16.0",

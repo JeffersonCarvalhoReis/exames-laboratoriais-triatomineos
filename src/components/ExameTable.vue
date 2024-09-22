@@ -7,6 +7,7 @@
       </q-td>
     </template>
 
+
     <!-- Coluna da lixeira para excluir a linha -->
     <template v-slot:body-cell-actions="props">
       <q-td align="center">
@@ -25,6 +26,14 @@
             </q-card-actions>
           </q-card>
         </q-dialog>
+        <q-dialog v-model="loading" persistent>
+          <q-card class="q-dialog-plugin">
+            <q-card-section class="q-pa-md" align="center">
+              <q-spinner color="primary" size="50px" />
+              <div class="q-mt-md">Excluindo exame...</div>
+            </q-card-section>
+          </q-card>
+        </q-dialog>
       </q-td>
     </template>
   </q-table>
@@ -38,7 +47,8 @@
     data() {
       return {
         excluir: false,
-        exameSelecionado: null, // Para armazenar o exame selecionado para exclusão
+        exameSelecionado: null,
+        loading: false // Para armazenar o exame selecionado para exclusão
       };
     },
     props: {
@@ -58,6 +68,7 @@
         this.excluir = true; // Abre o diálogo de confirmação
       },
       async excluirExame(exame) {
+        this.loading = true
         try {
           const exameRef = doc(db, "exames", exame.id); // Use o ID do exame
           await updateDoc(exameRef, {
@@ -74,6 +85,8 @@
             type: "negative",
           });
           console.error("Erro ao excluir exame:", error);
+        } finally {
+          this.loading = false
         }
       },
     },
