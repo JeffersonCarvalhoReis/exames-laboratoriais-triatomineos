@@ -71,6 +71,14 @@
       <ExameTable class="q-mt-md" :resultados="resultadosPorQuadrimestre" :columns="columns"
         :buscarResultados="buscarResultados" v-if="semResultado" />
     </div>
+    <q-dialog v-model="downloading" persistent>
+      <q-card class="q-dialog-plugin">
+        <q-card-section class="q-pa-md" align="center">
+          <q-spinner color="primary" size="50px" />
+          <div class="q-mt-md">Aguarde...</div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -90,6 +98,7 @@
         loading: true, // Controla o estado de carregamento
         semResultado: true,
         resultadosPorQuadrimestre: [], // Aqui será preenchido com dados reais
+        downloading: false,
         columns: [
           { name: "details", label: "Detalhes", align: "center" }, // Coluna para a lupa
           {
@@ -152,9 +161,7 @@
     methods: {
 
       async gerarPDF(key) {
-        // Coleta todos os resultados
-        // Obtém o quadrimestre correspondente ao key
-        console.log(key)
+        this.downloading = true
         const quadrimestreSelecionado = this.quadrimestresOrdenadosFormatados.find(exame => exame.key === key);
 
         // Filtra os resultados que pertencem ao mesmo quadrimestre
@@ -194,6 +201,7 @@
         const alturaPagina = doc.internal.pageSize.getHeight(); // altura da página
         const espacamentoAssinatura = 30; // Espaço reservado para assinaturas no final
         const alturaLinha = 5;
+
         let y = 15; // Posição inicial no eixo Y
 
 
@@ -235,9 +243,14 @@
           doc.text("Data do Exame", 71, y + 2);
           doc.text("Responsável pelo Exame", 125, y);
           y += alturaLinha;
+          doc.setFontSize(12);
           doc.text(`${resultado.numeroEtiqueta}`, margemEsquerda + 20, y + 3);
+
+          doc.setFontSize(10);
           doc.text(`${formatarData(resultado.dataExame)}`, 74, y + 3);
-          doc.text(`${resultado.responsavel}`, 110, y + 3);
+          const resp = doc.getTextWidth(resultado.responsavel);
+          const xResp = (95 - resp) / 2
+          doc.text(`${resultado.responsavel}`, 95 + xResp, y + 3);
 
           doc.rect(margemEsquerda, 36, 50, 12, 'S') //retangulo do numero da etiqueta
           doc.rect(68, 36, 30, 12, 'S') //retangulo da data do exame
@@ -290,20 +303,75 @@
 
               doc.setFontSize(10);
               doc.text(` Nome`, 42, y);
-              doc.text(`${exameDetalhe.captura == "intra" ? "X  " : "    "} 1 - Intra`, primeiroDist - 1, y);
-              doc.text(`${exameDetalhe.estagio == "ninfa" ? "X  " : "    "} 1 - Ninfa`, segundaDist - 1, y);
-              doc.text(`${exameDetalhe.resultado == "positivo" ? "X  " : "    "} 1 - Positivo`, terceiraDist - 1, y);
+
+              doc.addFont('src/assets/fonts/checkmark2.ttf', 'checkmark', 'normal');
+              doc.setFont('checkmark');
+              doc.setFontSize(13);
+              doc.text(`${exameDetalhe.captura == "intra" ? "\u0000" : ""}`, primeiroDist - 2, y + 1);
+              doc.setFont('Helvetica');
+              doc.setFontSize(10);
+              doc.text(` 1 - Intra`, primeiroDist + 3, y);
+
+              doc.addFont('src/assets/fonts/checkmark2.ttf', 'checkmark', 'normal');
+              doc.setFont('checkmark');
+              doc.setFontSize(13);
+              doc.text(`${exameDetalhe.estagio == "ninfa" ? "\u0000" : ""}`, segundaDist - 2, y + 1);
+              doc.setFont('Helvetica');
+              doc.setFontSize(10);
+              doc.text(` 1 - Ninfa`, segundaDist + 3, y);
+
+              doc.addFont('src/assets/fonts/checkmark2.ttf', 'checkmark', 'normal');
+              doc.setFont('checkmark');
+              doc.setFontSize(13);
+              doc.text(`${exameDetalhe.resultado == "positivo" ? "\u0000" : ""}`, terceiraDist - 2, y + 1);
+              doc.setFont('Helvetica');
+              doc.setFontSize(10);
+              doc.text(` 1 - Positivo`, terceiraDist + 3, y);
               y += alturaLinha;
 
               doc.text(` ${exameDetalhe.codigo}`, margemEsquerda + 5, y);
               doc.text(` ${this.quebrarLinhaSeNecessario(exameDetalhe.nome)}`, 32, y);
-              doc.text(`${exameDetalhe.estagio == "adulto-macho" || exameDetalhe.estagio == "adulto" ? "X  " : "    "} 2 - Adulto Macho`, segundaDist - 1, y);
-              doc.text(`${exameDetalhe.resultado == "negativo" ? "X  " : "    "} 2 - Negativo`, terceiraDist - 1, y);
+
+              doc.addFont('src/assets/fonts/checkmark2.ttf', 'checkmark', 'normal');
+              doc.setFont('checkmark');
+              doc.setFontSize(13);
+              doc.text(`${exameDetalhe.estagio == "adulto-macho" || exameDetalhe.estagio == "adulto" ? "\u0000" : ""}`, segundaDist - 2, y + 1);
+              doc.setFont('Helvetica');
+              doc.setFontSize(10);
+              doc.text(` 2 - Adulto Macho`, segundaDist + 3, y);
+
+              doc.addFont('src/assets/fonts/checkmark2.ttf', 'checkmark', 'normal');
+              doc.setFont('checkmark');
+              doc.setFontSize(13);
+              doc.text(`${exameDetalhe.resultado == "negativo" ? "\u0000" : ""}`, terceiraDist - 2, y + 1);
+              doc.setFont('Helvetica');
+              doc.setFontSize(10);
+              doc.text(` 2 - Negativo`, terceiraDist + 3, y);
               y += alturaLinha;
 
-              doc.text(`${exameDetalhe.captura == "peri" ? "X  " : "    "} 2 - Peri`, primeiroDist - 1, y);
-              doc.text(`${exameDetalhe.estagio == "adulto-femea" ? "X  " : "    "} 3 - Adulto Fêmea`, segundaDist - 1, y);
-              doc.text(`${exameDetalhe.resultado == "nao-examinado" ? "X  " : "    "} 3 - Não Examinado`, terceiraDist - 1, y);
+              doc.addFont('src/assets/fonts/checkmark2.ttf', 'checkmark', 'normal');
+              doc.setFont('checkmark');
+              doc.setFontSize(13);
+              doc.text(`${exameDetalhe.captura == "peri" ? "\u0000" : ""}`, primeiroDist - 2, y + 1);
+              doc.setFont('Helvetica');
+              doc.setFontSize(10);
+              doc.text(` 2 - Peri`, primeiroDist + 3, y);
+
+              doc.addFont('src/assets/fonts/checkmark2.ttf', 'checkmark', 'normal');
+              doc.setFont('checkmark');
+              doc.setFontSize(13);
+              doc.text(`${exameDetalhe.estagio == "adulto-femea" ? "\u0000" : ""}`, segundaDist - 2, y + 1);
+              doc.setFont('Helvetica');
+              doc.setFontSize(10);
+              doc.text(` 3 - Adulto Fêmea`, segundaDist + 3, y);
+
+              doc.addFont('src/assets/fonts/checkmark2.ttf', 'checkmark', 'normal');
+              doc.setFont('checkmark');
+              doc.setFontSize(13);
+              doc.text(`${exameDetalhe.resultado == "nao-examinado" ? "\u0000" : ""}`, terceiraDist - 2, y + 1);
+              doc.setFont('Helvetica');
+              doc.setFontSize(10);
+              doc.text(` 3 - Não Examinado`, terceiraDist + 3, y);
               y += alturaLinha + 5;
 
               //acresenta mais uma pagina se o conteudo ultrapassar uma pagina
@@ -348,9 +416,15 @@
                 doc.text("Data do Exame", 71, y + 2);
                 doc.text("Responsável pelo Exame", 125, y);
                 y += alturaLinha;
+
+                doc.setFontSize(12);
                 doc.text(`${resultado.numeroEtiqueta}`, margemEsquerda + 20, y + 3);
+
+                doc.setFontSize(10);
                 doc.text(`${formatarData(resultado.dataExame)}`, 74, y + 3);
-                doc.text(`${resultado.responsavel}`, 110, y + 3);
+                const resp = doc.getTextWidth(resultado.responsavel);
+                const xResp = (95 - resp) / 2
+                doc.text(`${resultado.responsavel}`, 95 + xResp, y + 3);
 
                 doc.rect(margemEsquerda, 36, 50, 12, 'S') //retangulo do numero da etiqueta
                 doc.rect(68, 36, 30, 12, 'S') //retangulo da data do exame
@@ -396,6 +470,8 @@
         });
 
         doc.save(`Exames do ${exame.key}.pdf`);
+        this.downloading = false
+
 
       },
       adicionarAssinaturas(doc, margemEsquerda, margemDireita, posicaoY) {
