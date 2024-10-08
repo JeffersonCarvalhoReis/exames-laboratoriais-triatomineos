@@ -43,8 +43,11 @@
           </tr>
         </tbody>
       </q-markup-table>
-      <q-skeleton type="QBtn" width="170px" />
-
+      <div class="row no-wrap">
+        <q-skeleton type="QBtn" width="170px" />
+        <q-space />
+        <q-skeleton type="QBtn" width="150px" />
+      </div>
     </div>
 
     <!-- Content -->
@@ -61,9 +64,14 @@
         <div class="row no-wrap">
           <q-btn label="Gerar Resultados" color="secondary" @click="gerarResultados(key)" />
           <q-space />
-          <q-btn label="gerar pdf" icon="fa-regular fa-file-pdf" color="secondary" @click="gerarPDF(exames.key)" />
+          <q-btn color="secondary" :disable="downloading" @click="gerarPDF(exames.key)">
+            <q-icon v-if="!downloading" name="fa-regular fa-file-pdf" />
+            <template v-if="downloading">
+              <q-spinner-hourglass />
+            </template>
+            {{ downloading ? "aguarde..." :
+              "gerar pdf" }}</q-btn>
         </div>
-
 
         <q-separator class="q-mt-md" v-if="quadrimestresOrdenados.length > 1" />
         <div class="q-mt-md"></div>
@@ -71,14 +79,6 @@
       <ExameTable class="q-mt-md" :resultados="resultadosPorQuadrimestre" :columns="columns"
         :buscarResultados="buscarResultados" v-if="semResultado" />
     </div>
-    <q-dialog v-model="downloading" persistent>
-      <q-card class="q-dialog-plugin">
-        <q-card-section class="q-pa-md" align="center">
-          <q-spinner color="primary" size="50px" />
-          <div class="q-mt-md">Aguarde...</div>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
   </q-page>
 </template>
 
@@ -162,6 +162,9 @@
 
       async gerarPDF(key) {
         this.downloading = true
+        setTimeout(() => {
+          this.downloading = false;
+        }, 3000)
         const quadrimestreSelecionado = this.quadrimestresOrdenadosFormatados.find(exame => exame.key === key);
 
         // Filtra os resultados que pertencem ao mesmo quadrimestre
@@ -470,7 +473,6 @@
         });
 
         doc.save(`Exames do ${exame.key}.pdf`);
-        this.downloading = false
 
 
       },
