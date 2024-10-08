@@ -304,7 +304,7 @@
               doc.setFontSize(10);
               doc.text(` Nome`, 42, y);
 
-              doc.addFont('src/assets/fonts/checkmark2.ttf', 'checkmark', 'normal');
+              doc.addFont('/fonts/checkmark2.ttf', 'checkmark', 'normal');
               doc.setFont('checkmark');
               doc.setFontSize(13);
               doc.text(`${exameDetalhe.captura == "intra" ? "\u0000" : ""}`, primeiroDist - 2, y + 1);
@@ -312,7 +312,7 @@
               doc.setFontSize(10);
               doc.text(` 1 - Intra`, primeiroDist + 3, y);
 
-              doc.addFont('src/assets/fonts/checkmark2.ttf', 'checkmark', 'normal');
+              doc.addFont('/fonts/checkmark2.ttf', 'checkmark', 'normal');
               doc.setFont('checkmark');
               doc.setFontSize(13);
               doc.text(`${exameDetalhe.estagio == "ninfa" ? "\u0000" : ""}`, segundaDist - 2, y + 1);
@@ -320,7 +320,7 @@
               doc.setFontSize(10);
               doc.text(` 1 - Ninfa`, segundaDist + 3, y);
 
-              doc.addFont('src/assets/fonts/checkmark2.ttf', 'checkmark', 'normal');
+              doc.addFont('/fonts/checkmark2.ttf', 'checkmark', 'normal');
               doc.setFont('checkmark');
               doc.setFontSize(13);
               doc.text(`${exameDetalhe.resultado == "positivo" ? "\u0000" : ""}`, terceiraDist - 2, y + 1);
@@ -332,7 +332,7 @@
               doc.text(` ${exameDetalhe.codigo}`, margemEsquerda + 5, y);
               doc.text(` ${this.quebrarLinhaSeNecessario(exameDetalhe.nome)}`, 32, y);
 
-              doc.addFont('src/assets/fonts/checkmark2.ttf', 'checkmark', 'normal');
+              doc.addFont('/fonts/checkmark2.ttf', 'checkmark', 'normal');
               doc.setFont('checkmark');
               doc.setFontSize(13);
               doc.text(`${exameDetalhe.estagio == "adulto-macho" || exameDetalhe.estagio == "adulto" ? "\u0000" : ""}`, segundaDist - 2, y + 1);
@@ -340,7 +340,7 @@
               doc.setFontSize(10);
               doc.text(` 2 - Adulto Macho`, segundaDist + 3, y);
 
-              doc.addFont('src/assets/fonts/checkmark2.ttf', 'checkmark', 'normal');
+              doc.addFont('/fonts/checkmark2.ttf', 'checkmark', 'normal');
               doc.setFont('checkmark');
               doc.setFontSize(13);
               doc.text(`${exameDetalhe.resultado == "negativo" ? "\u0000" : ""}`, terceiraDist - 2, y + 1);
@@ -349,7 +349,7 @@
               doc.text(` 2 - Negativo`, terceiraDist + 3, y);
               y += alturaLinha;
 
-              doc.addFont('src/assets/fonts/checkmark2.ttf', 'checkmark', 'normal');
+              doc.addFont('/fonts/checkmark2.ttf', 'checkmark', 'normal');
               doc.setFont('checkmark');
               doc.setFontSize(13);
               doc.text(`${exameDetalhe.captura == "peri" ? "\u0000" : ""}`, primeiroDist - 2, y + 1);
@@ -357,7 +357,7 @@
               doc.setFontSize(10);
               doc.text(` 2 - Peri`, primeiroDist + 3, y);
 
-              doc.addFont('src/assets/fonts/checkmark2.ttf', 'checkmark', 'normal');
+              doc.addFont('/fonts/checkmark2.ttf', 'checkmark', 'normal');
               doc.setFont('checkmark');
               doc.setFontSize(13);
               doc.text(`${exameDetalhe.estagio == "adulto-femea" ? "\u0000" : ""}`, segundaDist - 2, y + 1);
@@ -365,7 +365,7 @@
               doc.setFontSize(10);
               doc.text(` 3 - Adulto Fêmea`, segundaDist + 3, y);
 
-              doc.addFont('src/assets/fonts/checkmark2.ttf', 'checkmark', 'normal');
+              doc.addFont('/fonts/checkmark2.ttf', 'checkmark', 'normal');
               doc.setFont('checkmark');
               doc.setFontSize(13);
               doc.text(`${exameDetalhe.resultado == "nao-examinado" ? "\u0000" : ""}`, terceiraDist - 2, y + 1);

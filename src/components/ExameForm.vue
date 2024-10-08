@@ -82,13 +82,13 @@
                 <div class="q-mb-md">
                   <div class="q-gutter-md">
                     <div class="q-mb-xs q-gutter-xs q-col-gutter-md row items-center">
-                      <div class="col-auto">
+                      <div class="col-12 col-sm-auto">
                         <q-radio v-model="exame.estagio" val="ninfa" label="NINFA" />
                       </div>
-                      <div class="col-auto">
+                      <div class="col-12 col-sm-auto">
                         <q-radio v-model="exame.estagio" val="adulto-macho" label="ADULTO MACHO" />
                       </div>
-                      <div class="col-auto">
+                      <div class="col-12 col-sm-auto ">
                         <q-radio v-model="exame.estagio" val="adulto-femea" label="ADULTO FÊMEA" />
                       </div>
                     </div>
@@ -101,13 +101,13 @@
                 <div class="q-mb-md">
                   <div class="q-gutter-md">
                     <div class="q-mb-xs q-gutter-xs q-col-gutter-md row items-center">
-                      <div class="col-auto">
+                      <div class="col-12 col-sm-auto">
                         <q-radio v-model="exame.resultado" val="positivo" label="POSITIVO" />
                       </div>
-                      <div class="col-auto">
+                      <div class="col-12 col-sm-auto">
                         <q-radio v-model="exame.resultado" val="negativo" label="NEGATIVO" />
                       </div>
-                      <div class="col-auto">
+                      <div class="col-12 col-sm-auto">
                         <q-radio v-model="exame.resultado" val="nao-examinado" label="NÃO EXAMINADO" />
                       </div>
                     </div>
