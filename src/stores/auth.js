@@ -39,7 +39,7 @@ export const useAuthStore = defineStore("auth", () => {
       const errorCode = error.code;
       const errorMessage =
         errorMessages[errorCode] || "Ocorreu um erro desconhecido.";
-      console.log("teste", errorCode);
+      console.log("Erro: ", errorCode);
 
       $q.notify({
         message: errorMessage,
